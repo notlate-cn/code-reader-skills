@@ -5,7 +5,7 @@
 **基于认知科学的源代码深度理解工具 | Cognitive Science-Based Code Analysis Tool**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
+[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
 [![Claude Skills](https://img.shields.io/badge/Claude-Skills-orange.svg)](https://claude.ai)
 [![Language](https://img.shields.io/badge/language-中文%20%7C%20English-red.svg)](#)
 
@@ -31,6 +31,7 @@
 - 🚀 **应用迁移测试** - 检验能否在不同场景应用
 - 📚 **学术研究支撑** - 基于 Dunlosky, Chi, Karpicke 等认知科学研究
 - 🌐 **双语支持** - 完整的中文和英文版本
+- ⚡ **三种模式** - Quick/Standard/Deep 满足不同需求
 
 ### 🆚 版本对比
 
@@ -39,7 +40,7 @@
   <tr>
     <th>特性</th>
     <th>v1.0 基础版</th>
-    <th>v2.0 改进版 ⭐</th>
+    <th>v2.1 改进版 ⭐</th>
   </tr>
 </thead>
 <tbody>
@@ -52,6 +53,11 @@
     <td><strong>分析方法</strong></td>
     <td>逐行解析</td>
     <td>精细询问（强制 WHY）</td>
+  </tr>
+  <tr>
+    <td><strong>分析模式</strong></td>
+    <td>单一模式</td>
+    <td>Quick/Standard/Deep 三种模式</td>
   </tr>
   <tr>
     <td><strong>验证机制</strong></td>
@@ -68,11 +74,6 @@
     <td>❌ 无</td>
     <td>✅ 认知科学研究</td>
   </tr>
-  <tr>
-    <td><strong>适用场景</strong></td>
-    <td>快速了解代码</td>
-    <td>深度学习和掌握</td>
-  </tr>
 </tbody>
 </table>
 
@@ -80,13 +81,7 @@
 
 ```
 code-reader-skills/
-├── v1.0-basic/                      # 基础版本
-│   ├── code-reader-cn.skill         # 中文 Skill 包
-│   ├── code-reader-en.skill         # 英文 Skill 包
-│   ├── code-reader-cn-skill.md      # 中文文档
-│   └── code-reader-en-skill.md      # 英文文档
-│
-├── v2.0-improved/                   # 改进版本 ⭐ 推荐
+├── v2.1/                            # 最新版本 ⭐ 推荐
 │   ├── code-reader-v2-cn.skill      # 中文 Skill 包
 │   ├── code-reader-v2-en.skill      # 英文 Skill 包
 │   ├── code-reader-v2-cn-skill.md   # 中文文档
@@ -109,27 +104,17 @@ cd code-reader-skills
 # https://github.com/notlate-cn/code-reader-skills/releases
 ```
 
-#### 2. 选择合适的版本
+#### 2. 三种分析模式
 
-**推荐流程：**
+v2.1 支持三种分析深度，根据场景自动选择：
 
-```
-新手入门 → v1.0 基础版
-  ↓
-逐步熟悉
-  ↓
-深度学习 → v2.0 改进版 ⭐
-```
+| 模式 | 耗时 | 适用场景 | 触发词示例 |
+|------|------|---------|-----------|
+| **Quick** | 5-10 分钟 | 快速浏览、代码审查 | "快速分析"、"简单看看" |
+| **Standard** | 15-20 分钟 | 学习理解、技术调研 ⭐ | "深入分析"、"帮我理解" |
+| **Deep** | 30+ 分钟 | 面试准备、完全掌握 | "彻底分析"、"我要掌握" |
 
-**选择指南：**
-
-| 场景 | 推荐版本 | 文件 |
-|------|---------|------|
-| 快速浏览代码库 | v1.0 | `code-reader-cn.skill` |
-| 代码审查 | v1.0 | `code-reader-en.skill` |
-| 学习编程技术 | v2.0 ⭐ | `code-reader-v2-cn.skill` |
-| 技术面试准备 | v2.0 ⭐ | `code-reader-v2-en.skill` |
-| 研究开源项目 | v2.0 ⭐ | `code-reader-v2-cn.skill` |
+**默认使用 Standard Mode**
 
 #### 3. 导入到 Claude
 
@@ -140,21 +125,54 @@ cd code-reader-skills
 
 #### 4. 开始使用
 
-**v1.0 触发示例：**
+**Quick Mode 触发示例：**
 ```
-你：帮我分析这段代码
+你：快速分析这段代码
 [上传或粘贴代码]
 ```
 
-**v2.0 触发示例：**
+**Standard Mode 触发示例：**
 ```
 你：深入分析这段代码，我想理解它的设计原理
 [上传或粘贴代码]
 ```
 
+**Deep Mode 触发示例：**
+```
+你：我需要彻底掌握这个算法，准备面试用
+[上传或粘贴代码]
+```
+
+### 📊 v2.1 输出结构
+
+#### Quick Mode（快速概览）
+1. 👀 快速概览
+2. 📝 功能说明
+3. 📐 核心算法/设计
+4. 💻 关键代码段
+5. 📦 依赖关系
+6. 🎯 快速使用示例
+
+#### Standard Mode（标准理解）⭐
+1. 🧪 理解验证状态
+2. 👀 快速概览
+3. 🎯 背景与动机（精细询问）
+4. 📌 核心概念说明
+5. 📐 算法与理论
+6. 🏗️ 设计模式
+7. 💻 关键代码深度解析
+8. 📦 依赖与使用示例
+
+#### Deep Mode（完全掌握）
+[包含 Standard Mode 所有内容，加上]
+- 🔗 概念网络图
+- 📊 完整执行示例
+- 🚀 应用迁移场景（至少 2 个）
+- ✅ 质量验证清单
+
 ### 💡 使用示例
 
-#### 示例 1：学习 JWT 认证（v2.0）
+#### 示例 1：学习 JWT 认证（Standard Mode）
 
 <details>
 <summary>点击查看完整示例</summary>
@@ -170,10 +188,24 @@ def authenticate_user(username, password):
     return None
 ```
 
-**v2.0 输出（节选）：**
+**输出（节选）：**
 
 ```markdown
-## 理论基础：JWT (JSON Web Token)
+## 背景与动机分析
+
+**WHY 需要这段代码？**
+- 系统需要验证用户身份，保护未授权访问
+- 不写会导致任何人都能访问系统资源
+
+**WHY 选择 JWT 方案？**
+- 无状态认证，服务器不需要存储 Session
+- 自包含，Token 携带所有必要信息
+
+**WHY 不用 Session？**
+- Session 需要服务器存储，不利于水平扩展
+- 分布式系统需要共享 Session，增加复杂度
+
+## 算法与理论：JWT (JSON Web Token)
 
 **WHY 使用 JWT？**
 - 无状态认证，服务器不需要存储 Session
@@ -183,31 +215,11 @@ def authenticate_user(username, password):
 **WHY JWT 是安全的？**
 - 使用签名验证完整性
 - 无法伪造（除非私钥泄露）
-
-**WHY JWT 有局限性？**
-- 无法主动失效（需维护黑名单）
-- Token 体积较大（Base64 编码增加约 33%）
-
-## 应用迁移场景：API 密钥验证
-
-**不变的原理：**
-- 验证调用方身份的核心流程
-- 哈希存储凭证
-
-**需要修改的部分：**
-- 单参数（API 密钥）而非用户名+密码
-- 增加权限范围 (scope)
-
-## 质量验证清单
-
-- [x] 能否不看代码解释 JWT 原理？
-- [x] 能否说出为什么选择 JWT？
-- [x] 能否应用到其他场景？
 ```
 
 </details>
 
-#### 示例 2：理解算法复杂度（v2.0）
+#### 示例 2：理解算法复杂度（Deep Mode 应用迁移）
 
 <details>
 <summary>点击查看完整示例</summary>
@@ -224,48 +236,46 @@ def quicksort(arr):
     return quicksort(left) + middle + quicksort(right)
 ```
 
-**v2.0 输出（节选）：**
+**Deep Mode 输出（包含应用迁移）：**
 
 ```markdown
-## 算法分析：快速排序
+## 应用迁移场景：从快排到日志排序
 
-**WHY 选择快速排序？**
-- 平均 O(n log n)，实际应用中通常最快
-- 原地排序，空间效率高
-- 缓存友好，访问局部性好
+### 场景：对数百万条日志按时间戳排序
 
-**WHY 可接受最坏 O(n²)？**
-- 最坏情况概率极低
-- 可通过随机化 Pivot 避免
+**不变的原理：**
+- 分治思想：递归分解问题
+- Pivot 选择：影响性能的关键
+- 原地排序：节省空间
 
-**WHY 不用归并/堆排序？**
-- 归并：需要 O(n) 额外空间
-- 堆排：缓存性能差
+**需要调整的部分：**
+```python
+# 迁移：外部排序 + timsort 优化
+def quicksort_logs(log_file, output_file, memory_limit):
+    # WHY 外部排序：数据量超过内存
+    chunks = split_file_into_chunks(log_file, memory_limit)
 
-**什么时候会退化？**
-- 已排序输入 → 用随机化解决
-- Pivot 选择不当 → 用三数取中优化
+    for chunk in chunks:
+        logs = load_chunk(chunk)
+        # WHY 用 timsort：日志通常部分有序
+        logs.sort(key=lambda log: log.timestamp)
+        save_sorted_chunk(chunk, logs)
+
+    merge_sorted_chunks(chunks, output_file)
+    return output_file
+```
+
+**学到的通用模式：**
+- 算法选择取决于数据特征（规模、有序性）
+- 基本原理可迁移（分治、比较），但实现需调整
+- 超大数据需要外部算法（分块+归并）
 ```
 
 </details>
 
-### 📊 v2.0 输出结构
-
-完整分析文档包含 **9 个核心部分**：
-
-1. 🧪 **理解验证状态** - 自我解释测试结果
-2. 👀 **快速概览** - 语言、规模、依赖
-3. 🎯 **背景与动机** - 3 层 WHY 分析
-4. 🔗 **概念网络图** - 概念清单 + 关系矩阵
-5. 📐 **算法与理论** - 复杂度 + WHY + 参考
-6. 🏗️ **设计模式** - WHY 使用 + WHY 有效
-7. 💻 **关键代码** - 逐行 WHY + 执行示例
-8. 🚀 **应用迁移** - 至少 2 个不同场景
-9. ✅ **质量验证** - 自我评估清单
-
 ### 🔬 研究基础
 
-v2.0 基于以下认知科学研究：
+v2.1 基于以下认知科学研究：
 
 - **[Dunlosky et al. (2013)](https://www.aft.org/ae/fall2013/dunlosky)** - 精细询问法显著优于被动阅读
 - **[Chi et al. (1994)](https://onlinelibrary.wiley.com/doi/10.1207/s15516709cog1803_3)** - 自我解释者获得正确心智模型的概率更高
@@ -283,27 +293,20 @@ v2.0 基于以下认知科学研究：
 ### ❓ 常见问题
 
 <details>
-<summary><strong>Q: 我应该用 v1.0 还是 v2.0？</strong></summary>
+<summary><strong>Q: 三种模式有什么区别？</strong></summary>
 
-**A:** 取决于你的目标：
-- **快速了解** → v1.0
-- **深度掌握** → v2.0 ⭐
-- 也可以都导入，根据需求切换
+**A:**
+- **Quick**：快速了解代码结构和功能，5-10 分钟
+- **Standard**：理解 WHY 和设计思路，15-20 分钟（推荐）
+- **Deep**：应用迁移测试 + 质量验证，30+ 分钟
+
+根据你的目标选择合适模式。
 </details>
 
 <details>
 <summary><strong>Q: 可以同时使用中文和英文版本吗？</strong></summary>
 
 **A:** 可以！同时导入两个语言版本，通过对话语言选择使用哪个。
-</details>
-
-<details>
-<summary><strong>Q: v2.0 的分析会很长吗？</strong></summary>
-
-**A:** 是的，v2.0 更详细，但这是有意为之：
-- 更多 WHY 解释 → 深层理解
-- 应用迁移示例 → 检验掌握
-- 质量验证清单 → 确保完整
 </details>
 
 <details>
@@ -317,7 +320,7 @@ v2.0 基于以下认知科学研究：
 <details>
 <summary><strong>Q: 如何判断我真正理解了？</strong></summary>
 
-**A:** 使用 v2.0 的"四能"测试：
+**A:** 使用 Deep Mode 的"四能"测试：
 1. ✅ 能否不看代码解释设计思路？
 2. ✅ 能否独立实现类似功能？
 3. ✅ 能否应用到不同场景？
@@ -325,6 +328,17 @@ v2.0 基于以下认知科学研究：
 </details>
 
 ### 📝 更新日志
+
+#### v2.1.0 (2026-01-31) - 三模式版本
+
+**新增功能：**
+- ✨ Quick/Standard/Deep 三种分析模式
+- ✨ 智能模式选择机制
+- ✨ 优化输出结构
+
+**改进：**
+- 📖 更新 README 说明
+- 🎯 精简触发词
 
 #### v2.0.0 (2026-01-31) - 改进版发布
 
@@ -336,19 +350,12 @@ v2.0 基于以下认知科学研究：
 - ✨ 应用迁移测试
 - ✨ 质量验证清单
 
-**改进：**
-- 📚 添加学术研究支撑
-- 📖 完善文档和示例
-- 🎯 优化触发机制
-
 #### v1.0.0 (2026-01-31) - 基础版发布
 
 **核心功能：**
 - ✅ 中英文双语支持
 - ✅ 8 大分析部分
 - ✅ 逐行代码解析
-- ✅ 算法和设计模式标注
-- ✅ 多文件项目分析
 
 ### 📄 许可证
 
@@ -383,6 +390,7 @@ A professional Claude Skills set that helps developers **truly understand** sour
 - 🚀 **Application Transfer Test** - Examine if applicable in different scenarios
 - 📚 **Academic Research Support** - Based on Dunlosky, Chi, Karpicke's cognitive science research
 - 🌐 **Bilingual Support** - Complete Chinese and English versions
+- ⚡ **Three Modes** - Quick/Standard/Deep for different needs
 
 ### 🆚 Version Comparison
 
@@ -391,7 +399,7 @@ A professional Claude Skills set that helps developers **truly understand** sour
   <tr>
     <th>Feature</th>
     <th>v1.0 Basic</th>
-    <th>v2.0 Improved ⭐</th>
+    <th>v2.1 Improved ⭐</th>
   </tr>
 </thead>
 <tbody>
@@ -404,6 +412,11 @@ A professional Claude Skills set that helps developers **truly understand** sour
     <td><strong>Analysis Method</strong></td>
     <td>Line-by-line parsing</td>
     <td>Elaborative interrogation (force WHY)</td>
+  </tr>
+  <tr>
+    <td><strong>Analysis Modes</strong></td>
+    <td>Single mode</td>
+    <td>Quick/Standard/Deep modes</td>
   </tr>
   <tr>
     <td><strong>Verification</strong></td>
@@ -420,11 +433,6 @@ A professional Claude Skills set that helps developers **truly understand** sour
     <td>❌ None</td>
     <td>✅ Cognitive science research</td>
   </tr>
-  <tr>
-    <td><strong>Use Cases</strong></td>
-    <td>Quick code overview</td>
-    <td>Deep learning and mastery</td>
-  </tr>
 </tbody>
 </table>
 
@@ -436,22 +444,17 @@ A professional Claude Skills set that helps developers **truly understand** sour
 # Clone repository
 git clone https://github.com/notlate-cn/code-reader-skills.git
 cd code-reader-skills
-
-# Or download Release directly
-# https://github.com/notlate-cn/code-reader-skills/releases
 ```
 
-#### 2. Choose Appropriate Version
+#### 2. Three Analysis Modes
 
-**Recommended Flow:**
+| Mode | Duration | Use Case | Trigger Examples |
+|------|----------|----------|------------------|
+| **Quick** | 5-10 min | Quick browse, code review | "quickly analyze", "briefly look" |
+| **Standard** | 15-20 min | Learning, research ⭐ | "deeply analyze", "help me understand" |
+| **Deep** | 30+ min | Interview prep, mastery | "thoroughly analyze", "I need to master this" |
 
-```
-Beginner → v1.0 Basic
-  ↓
-Gradually Familiar
-  ↓
-Deep Learning → v2.0 Improved ⭐
-```
+**Default: Standard Mode**
 
 #### 3. Import to Claude
 
@@ -462,7 +465,7 @@ Deep Learning → v2.0 Improved ⭐
 
 ### 🔬 Research Foundation
 
-v2.0 is based on the following cognitive science research:
+v2.1 is based on the following cognitive science research:
 
 - **[Dunlosky et al. (2013)](https://www.aft.org/ae/fall2013/dunlosky)** - Elaborative interrogation significantly outperforms passive reading
 - **[Chi et al. (1994)](https://onlinelibrary.wiley.com/doi/10.1207/s15516709cog1803_3)** - Self-explainers achieve correct mental models with higher probability
@@ -495,6 +498,6 @@ If this project helps you, please give it a Star ⭐
 
 **基于 ❤️ 和 🧠 创建，助力深度理解代码**
 
-[⬆ 回到顶部](#-code-deep-understanding-analyzer)
+[⬆ Back to Top](#-code-deep-understanding-analyzer)
 
 </div>

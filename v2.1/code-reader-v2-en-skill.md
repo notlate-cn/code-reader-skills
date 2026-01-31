@@ -1,11 +1,43 @@
 ---
 name: code-reader-v2-en
-description: Cognitive science-based source code deep understanding assistant (English improved version). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code, not just "get it." Use when users need to deeply understand source code, learn programming techniques, prepare for technical interviews, or conduct code reviews. Trigger words "deeply analyze this code," "help me understand this algorithm," "explain this implementation principle," "why is the code written this way."
+description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick (5-10 min), Standard (15-20 min), Deep (30+ min). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code. Trigger words "deeply analyze this code," "help me understand this algorithm," "quickly analyze this code."
 ---
 
 # Source Code Deep Understanding Analyzer v2.0
 
-Professional code analysis tool based on cognitive science research, ensuring true understanding rather than fluency illusion.
+Professional code analysis tool based on cognitive science research, supporting three analysis depths to ensure true understanding rather than fluency illusion.
+
+## Three Analysis Modes
+
+**Quick Mode** - Efficient overview, 5-10 minutes
+- Fast understanding of code structure and functionality
+- Best for code reviews, quick browsing
+
+**Standard Mode** - Balanced understanding ⭐ Recommended, 15-20 minutes
+- Understand WHY and design rationale
+- Best for learning new tech, code comprehension
+
+**Deep Mode** - Complete mastery, 30+ minutes
+- Application transfer testing + quality verification
+- Best for interview prep, deep research
+
+**Default: Standard Mode unless user specifies otherwise.**
+
+---
+
+## Mode Selection Guide
+
+Before starting analysis, automatically select mode based on user intent:
+
+| User Intent | Recommended Mode | Trigger Examples |
+|-------------|-----------------|------------------|
+| Quick browse/code review | Quick | "quickly analyze", "briefly look", "what does this do" |
+| Learning/technical research | Standard | "deeply analyze", "help me understand", "explain principles" |
+| Interview prep/complete mastery | Deep | "thoroughly analyze", "I need to master this", "interview related" |
+
+**If user doesn't specify, default to Standard Mode.**
+
+---
 
 ## Core Philosophy: Understanding First, Memorization Second
 
@@ -30,30 +62,130 @@ Professional code analysis tool based on cognitive science research, ensuring tr
 
 ## Pre-Analysis Mandatory Check: Understanding Verification Gate
 
-**Before generating any analysis, must complete the following verification:**
+**Based on selected mode, execute corresponding verification:**
 
-### Self-Explanation Test
+### Quick Mode - Simplified Check
+- Quickly identify code type and core functionality
+- List key concepts (no deep verification)
 
-For each core concept to be analyzed:
+### Standard Mode - Standard Verification
+- Self-explanation test for core concepts
+- Verify ability to articulate WHY
 
-1. **Without looking at code**, can you explain it in your own words?
-2. **Can you articulate WHY**, not just WHAT?
-3. **Can you apply this concept** in different scenarios?
-
-**Verification Standards:**
-- ✅ Pass → Continue analysis and deepen understanding
-- ❌ Fail → Mark as `⚠️ Needs Deeper Understanding` in analysis and increase explanation depth
+### Deep Mode - Complete Verification
+- Full self-explanation test
+- Application transfer ability verification
 
 **Output Format (at beginning of analysis document):**
 
 ```markdown
-## Understanding Verification Status
+## Understanding Verification Status [Standard/Deep Mode Only]
 
 | Core Concept | Self-Explanation | Understanding WHY | Application Transfer | Status |
 |--------------|------------------|-------------------|---------------------|---------|
 | User Authentication Flow | ✅ | ✅ | ✅ | Understood |
 | JWT Token Mechanism | ✅ | ⚠️ | ❌ | ⚠️ Needs Deeper Understanding |
 | Password Hashing | ✅ | ✅ | ⚠️ | Basic Understanding |
+```
+
+---
+
+## Three Mode Output Structures
+
+### Quick Mode Output Structure (5-10 min)
+
+```markdown
+# [Code Name] Quick Analysis
+
+## 1. Quick Overview
+- Programming language and version
+- Code scale and type
+- Core dependencies
+
+## 2. Functionality Description
+- What it does (WHAT)
+- Brief explanation of WHY needed
+
+## 3. Core Algorithm/Design
+- Algorithm complexity (if applicable)
+- Design patterns used (if applicable)
+- WHY this algorithm/pattern
+
+## 4. Key Code Segments
+- 3-5 core code segments
+- Brief purpose description for each
+
+## 5. Dependencies
+- External library list and purposes
+
+## 6. Quick Usage Example
+- Simple runnable example
+```
+
+### Standard Mode Output Structure (15-20 min) ⭐ Recommended
+
+```markdown
+# [Code Name] Deep Understanding Analysis
+
+## Understanding Verification Status
+[Self-explanation test results table]
+
+## 1. Quick Overview
+- Language, scale, dependencies
+
+## 2. Background & Motivation (Elaborative Interrogation)
+- WHY this code is needed
+- WHY this approach
+- WHY not other alternatives
+
+## 3. Core Concepts
+- List key concepts
+- Each concept answers 2-3 WHYs
+
+## 4. Algorithm & Theory
+- Complexity analysis
+- WHY this algorithm
+- References
+
+## 5. Design Patterns
+- Patterns identified
+- WHY used
+
+## 6. Key Code Deep Analysis
+- Line-by-line WHY analysis
+- Execution flow examples
+
+## 7. Dependencies & Usage Examples
+- Detailed WHY comments
+```
+
+### Deep Mode Output Structure (30+ min)
+
+```markdown
+# [Code Name] Complete Mastery Analysis
+
+[All Standard Mode content, plus:]
+
+## 3+. Concept Network Diagram
+- Core concept inventory (3 WHYs each)
+- Concept relationship matrix
+- Connections to existing knowledge
+
+## 6+. Complete Execution Examples
+- Multi-scenario execution flows
+- Boundary conditions
+- Error-prone points
+
+## 8. Application Transfer Scenarios (at least 2)
+- Scenario 1: Constant principles + modifications + WHY
+- Scenario 2: Constant principles + modifications + WHY
+- Extract universal patterns
+
+## 9. Quality Verification Checklist
+- Understanding depth verification
+- Technical accuracy verification
+- Practicality verification
+- Final "four abilities" test
 ```
 
 ---
