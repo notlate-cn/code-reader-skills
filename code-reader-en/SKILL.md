@@ -1016,3 +1016,49 @@ Before starting analysis, confirm:
 - [ ] Ready to think about application transfer
 
 **Remember: Goal is not "finish reading code" but "truly understand code."**
+
+---
+
+## 📤 Output Requirements
+
+**After analysis completion, you MUST generate a standalone Markdown document!**
+
+### Document Generation Rules
+
+1. **File Naming Format**
+   - Format: `[code-name]-deep-analysis.md`
+   - Examples: `jwt-auth-deep-analysis.md`, `quicksort-deep-analysis.md`
+
+2. **Generation Method**
+   - **Method 1 (Recommended)**: Use Write tool to create file
+     ```
+     After completing analysis, use Write tool to write complete analysis to a separate file
+     ```
+
+   - **Method 2**: Ask user for save path
+     ```
+     After completing analysis, ask user for desired file path, then use Write tool to generate
+     ```
+
+3. **File Content**
+   - Complete analysis results (according to selected mode's output structure)
+   - Use Markdown format
+   - Preserve all formatting (headers, tables, code blocks, lists, etc.)
+
+### Output Workflow Example
+
+```
+User: Deeply analyze this code
+
+1. [Complete analysis process]
+
+2. [Show analysis summary in conversation]
+
+3. Use Write tool to generate complete document:
+   File path: [code-name]-deep-analysis.md
+   Content: [Complete analysis content]
+
+4. Inform user: "Complete analysis saved to [file path]"
+```
+
+**Important: Don't just output analysis in conversation - you MUST generate a saveable Markdown file!**
