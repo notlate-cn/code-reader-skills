@@ -472,53 +472,102 @@ def authenticate_user(username, password):
     return None
 ```
 
-**逐行精细解析：**
+**逐行精细解析（推荐注释风格）：场景化 + 执行流追踪**
+
+> **注释风格说明：**
+> - 使用 `// 场景 N: [描述]` 标注不同分支场景
+> - 用具体变量值追踪执行流程
+> - 注明循环/递归的迭代状态
+> - 标注关键数据的变化轨迹
 
 ```python
 def authenticate_user(username, password):
-    # 定义认证函数，接收用户名和明文密码
-    # WHY 接收明文密码：必须在服务端验证，不能在客户端哈希（不安全）
-    
-    user = db.find_user(username)
-    # 根据用户名查询用户对象
-    # WHY 先查用户：避免不存在的用户名也进行密码哈希（节省计算）
-    # 返回：User 对象（包含 id, username, password_hash 等）或 None
-    
+    // 场景 1: 若用户不存在，立即返回 None
     if not user:
         return None
-    # 用户不存在时立即返回 None
-    # WHY 返回 None 而非抛异常：认证失败是正常业务流程，非异常情况
-    # WHY 不区分"用户不存在"和"密码错误"：防止用户名枚举攻击
-    
+        // WHY 返回 None 而非抛异常：认证失败是正常业务流程，非异常情况
+        // WHY 不区分"用户不存在"和"密码错误"：防止用户名枚举攻击
+
+    // 场景 2: 若密码验证通过，生成并返回 Token
     if verify_password(password, user.password_hash):
-        # 验证明文密码与数据库哈希值是否匹配
-        # WHY 用 verify_password 而非直接比对：bcrypt 验证包含时间恒定比较
-        # verify_password 内部流程：
-        #   1. 从 password_hash 提取盐值 (Salt)
-        #   2. 用相同盐值哈希明文密码
-        #   3. 恒定时间比较两个哈希值（防止时序攻击）
-        
+        // verify_password 内部流程：
+        //   1. 从 password_hash 提取盐值 (Salt)
+        //   2. 用相同盐值哈希明文密码
+        //   3. 恒定时间比较两个哈希值（防止时序攻击）
         return generate_token(user.id)
-        # 密码正确，生成包含用户 ID 的 JWT Token
-        # WHY 只传 user.id：Token 应保持轻量，避免冗余数据
-        # WHY 不传敏感信息：JWT 是 Base64 编码，非加密，可被解码
-        
+        // 此时：user.id = 42（假设）
+        // generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    // 场景 3: 密码错误，返回 None
     return None
-    # 密码错误时返回 None
-    # WHY 与"用户不存在"相同的返回值：防止攻击者区分两种失败情况
+    // WHY 与"用户不存在"相同的返回值：防止攻击者区分两种失败情况
 ```
 
-**执行流程示例：**
+**完整执行流示例（多场景追踪）：**
+
+```cpp
+// 示例：追溯 tensor 生产者的函数（编译器代码典型风格）
+
+Value getProducerOfTensor(Value tensor) {
+  Value opResult;
+
+  while (true) {
+    // 场景 1: 若 tensor 由 LinalgOp 定义，直接返回
+    if (auto linalgOp = tensor.getDefiningOp<LinalgOp>()) {
+      opResult = cast<OpResult>(tensor);
+      // while 只循环 1 次
+      return;
+    }
+
+    // 按照本节示例，首次调用本函数时：tensor = %2_tile
+    // 场景 2: 若 tensor 通过 ExtractSliceOp 链接，继续追溯源
+    if (auto sliceOp = tensor.getDefiningOp<tensor::ExtractSliceOp>()) {
+      tensor = sliceOp.getSource();
+      // 此时：tensor = %2，由 linalg.matmul 定义
+      // 执行第二次 while 循环，会进入场景 1 分支 (linalg.matmul 是 LinalgOp)
+      continue;
+    }
+
+    // 场景 3: 通过 scf.for 的迭代参数
+    // 示例 IR：
+    // %1 = linalg.generic ins(%A) outs(%init) { ... }
+    // %2 = scf.for %i = 0 to 10 iter_args(%arg = %1) {
+    //   %3 = linalg.generic ins(%arg) outs(%init2) { ... }
+    //   scf.yield %3
+    // }
+    // getProducerOfTensor(%arg)
+    if (auto blockArg = dyn_cast<BlockArgument>(tensor)) {
+      // 第一次 while 循环：tensor = %arg，是 BlockArgument
+      if (auto forOp = blockArg.getDefiningOp<scf::ForOp>()) {
+        // %arg 由 scf.for 定义，获取循环的初始值：%1
+        // blockArg.getArgNumber() = 0（%arg 是第 0 个迭代参数）
+        // forOp.getInitArgs()[0] = %1
+        tensor = forOp.getInitArgs()[blockArg.getArgNumber()];
+        // 此时：tensor = %1，由 linalg.generic 定义
+        // 执行第二次 while 循环，会进入场景 1 分支
+        continue;
+      }
+    }
+
+    return;  // 找不到（可能是函数参数）
+  }
+}
+```
+
+**执行流程示例（推荐风格）：**
 
 **场景 1：认证成功**
 ```
+// 初始状态
 输入：username="alice", password="Secret123!"
 
+// 执行路径
 1. db.find_user("alice")
    → 查询数据库
    → 返回 User(id=42, username="alice", password_hash="$2b$12$KIX...")
+   // 此时：user 存在，继续执行
 
-2. user 存在，继续
+2. 进入场景 1 分支（用户存在），跳过场景 2 的 return None
 
 3. verify_password("Secret123!", "$2b$12$KIX...")
    → 提取盐值：$2b$12$KIX...
@@ -530,43 +579,55 @@ def authenticate_user(username, password):
    → 创建 payload: {"user_id": 42, "exp": 1643723400}
    → 使用私钥签名
    → 返回 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
+   // 最终返回：Token 字符串
 
-5. 函数返回 Token 字符串
-
+// 性能分析
 耗时：~100ms（主要是 bcrypt 计算）
 ```
 
 **场景 2：用户不存在**
 ```
+// 初始状态
 输入：username="bob", password="anything"
 
+// 执行路径
 1. db.find_user("bob")
    → 查询数据库
    → 返回 None
+   // 此时：user = None，进入场景 2 分支
 
-2. user 为 None，直接返回 None
+2. if not user: // true
+   → 直接返回 None
+   // 场景 1、3 都不执行
 
+// 性能分析
 耗时：~5ms（仅数据库查询）
 ⚠️ 注意：比认证成功快得多，可能泄露用户是否存在
-解决方案：添加固定延迟或假哈希计算，使两种情况耗时接近
+// 安全建议：添加固定延迟或假哈希计算，使两种情况耗时接近
 ```
 
 **场景 3：密码错误**
 ```
+// 初始状态
 输入：username="alice", password="WrongPass"
 
+// 执行路径
 1. db.find_user("alice")
    → 返回 User(id=42, ...)
+   // 此时：user 存在，进入场景 1 分支
 
-2. user 存在，继续
+2. 跳过场景 2 的 return None
 
 3. verify_password("WrongPass", "$2b$12$KIX...")
    → 哈希 "WrongPass"
    → 比较哈希值
    → 返回 False
 
-4. 返回 None
+4. if 分支为 false，不执行 generate_token
+   → 继续执行到最后的 return None
+   // 场景 3：密码验证失败，返回 None
 
+// 性能分析
 耗时：~100ms（与认证成功相近）
 ✅ 好处：无法通过响应时间判断密码是否正确
 ```

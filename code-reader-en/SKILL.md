@@ -472,53 +472,102 @@ def authenticate_user(username, password):
     return None
 ```
 
-**Line-by-Line Detailed Analysis:**
+**Line-by-Line Detailed Analysis (Recommended Comment Style: Scenario-Based + Execution Flow Tracking)**
+
+> **Comment Style Guide:**
+> - Use `// Scenario N: [description]` to label different branch scenarios
+> - Track execution flow with concrete variable values
+> - Annotate loop/recursion iteration states
+> - Mark key data transformation trajectories
 
 ```python
 def authenticate_user(username, password):
-    # Define authentication function, accepting username and plaintext password
-    # WHY accept plaintext password: Must verify on server, client-side hashing is insecure
-    
-    user = db.find_user(username)
-    # Query user object by username
-    # WHY query user first: Avoid password hashing for non-existent usernames (save computation)
-    # Returns: User object (containing id, username, password_hash, etc.) or None
-    
+    // Scenario 1: If user doesn't exist, return None immediately
     if not user:
         return None
-    # Return None immediately when user doesn't exist
-    # WHY return None not exception: Authentication failure is normal business flow, not exceptional
-    # WHY not distinguish "user doesn't exist" from "wrong password": Prevent username enumeration attack
-    
+        // WHY return None not exception: Auth failure is normal flow, not exceptional
+        // WHY not distinguish "user doesn't exist" from "wrong password": Prevent username enumeration
+
+    // Scenario 2: If password verification passes, generate and return Token
     if verify_password(password, user.password_hash):
-        # Verify if plaintext password matches database hash
-        # WHY use verify_password not direct comparison: bcrypt verification includes constant-time comparison
-        # verify_password internal flow:
-        #   1. Extract salt from password_hash
-        #   2. Hash plaintext password with same salt
-        #   3. Constant-time compare two hashes (prevent timing attack)
-        
+        // verify_password internal flow:
+        //   1. Extract salt from password_hash
+        //   2. Hash plaintext password with same salt
+        //   3. Constant-time compare hashes (prevent timing attack)
         return generate_token(user.id)
-        # Password correct, generate JWT Token containing user ID
-        # WHY only pass user.id: Token should stay lightweight, avoid redundant data
-        # WHY not pass sensitive info: JWT is Base64 encoded, not encrypted, can be decoded
-        
+        // At this point: user.id = 42 (assumed)
+        // generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    // Scenario 3: Wrong password, return None
     return None
-    # Return None when password incorrect
-    # WHY same return value as "user doesn't exist": Prevent attackers from distinguishing failure types
+    // WHY same return value as "user doesn't exist": Prevent attackers from distinguishing failures
 ```
 
-**Execution Flow Examples:**
+**Complete Execution Flow Example (Multi-Scenario Tracking):**
+
+```cpp
+// Example: Function to trace tensor producer (compiler code typical style)
+
+Value getProducerOfTensor(Value tensor) {
+  Value opResult;
+
+  while (true) {
+    // Scenario 1: If tensor defined by LinalgOp, return directly
+    if (auto linalgOp = tensor.getDefiningOp<LinalgOp>()) {
+      opResult = cast<OpResult>(tensor);
+      // while loop executes only 1 iteration
+      return;
+    }
+
+    // Per this example, on first call: tensor = %2_tile
+    // Scenario 2: If tensor linked through ExtractSliceOp, trace source
+    if (auto sliceOp = tensor.getDefiningOp<tensor::ExtractSliceOp>()) {
+      tensor = sliceOp.getSource();
+      // At this point: tensor = %2, defined by linalg.matmul
+      // Second while loop iteration will enter Scenario 1 (linalg.matmul is a LinalgOp)
+      continue;
+    }
+
+    // Scenario 3: Through scf.for iteration argument
+    // Example IR:
+    // %1 = linalg.generic ins(%A) outs(%init) { ... }
+    // %2 = scf.for %i = 0 to 10 iter_args(%arg = %1) {
+    //   %3 = linalg.generic ins(%arg) outs(%init2) { ... }
+    //   scf.yield %3
+    // }
+    // getProducerOfTensor(%arg)
+    if (auto blockArg = dyn_cast<BlockArgument>(tensor)) {
+      // First while iteration: tensor = %arg, is a BlockArgument
+      if (auto forOp = blockArg.getDefiningOp<scf::ForOp>()) {
+        // %arg defined by scf.for, get loop initial value: %1
+        // blockArg.getArgNumber() = 0 (%arg is 0th iteration argument)
+        // forOp.getInitArgs()[0] = %1
+        tensor = forOp.getInitArgs()[blockArg.getArgNumber()];
+        // At this point: tensor = %1, defined by linalg.generic
+        // Second while loop iteration will enter Scenario 1
+        continue;
+      }
+    }
+
+    return;  // Not found (might be function parameter)
+  }
+}
+```
+
+**Execution Flow Examples (Recommended Style):**
 
 **Scenario 1: Successful Authentication**
 ```
+// Initial state
 Input: username="alice", password="Secret123!"
 
+// Execution path
 1. db.find_user("alice")
    → Query database
    → Return User(id=42, username="alice", password_hash="$2b$12$KIX...")
+   // At this point: user exists, continue execution
 
-2. user exists, continue
+2. Enter Scenario 1 branch (user exists), skip Scenario 2's return None
 
 3. verify_password("Secret123!", "$2b$12$KIX...")
    → Extract salt: $2b$12$KIX...
@@ -530,43 +579,55 @@ Input: username="alice", password="Secret123!"
    → Create payload: {"user_id": 42, "exp": 1643723400}
    → Sign with private key
    → Return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
+   // Final return: Token string
 
-5. Function returns Token string
-
+// Performance analysis
 Duration: ~100ms (mainly bcrypt computation)
 ```
 
 **Scenario 2: User Doesn't Exist**
 ```
+// Initial state
 Input: username="bob", password="anything"
 
+// Execution path
 1. db.find_user("bob")
    → Query database
    → Return None
+   // At this point: user = None, enter Scenario 2 branch
 
-2. user is None, return None immediately
+2. if not user: // true
+   → Return None immediately
+   // Scenarios 1, 3 not executed
 
-Duration: ~5ms (only database query)
+// Performance analysis
+Duration: ~5ms (database query only)
 ⚠️ Note: Much faster than successful auth, may leak user existence
-Solution: Add fixed delay or fake hash computation to make durations similar
+// Security recommendation: Add fixed delay or fake hash to make durations similar
 ```
 
 **Scenario 3: Wrong Password**
 ```
+// Initial state
 Input: username="alice", password="WrongPass"
 
+// Execution path
 1. db.find_user("alice")
    → Return User(id=42, ...)
+   // At this point: user exists, enter Scenario 1 branch
 
-2. user exists, continue
+2. Skip Scenario 2's return None
 
 3. verify_password("WrongPass", "$2b$12$KIX...")
    → Hash "WrongPass"
    → Compare hashes
    → Return False
 
-4. Return None
+4. if branch is false, don't execute generate_token
+   → Continue to final return None
+   // Scenario 3: Password verification failed, return None
 
+// Performance analysis
 Duration: ~100ms (similar to successful auth)
 ✅ Benefit: Cannot determine password correctness by response time
 ```
