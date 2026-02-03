@@ -564,76 +564,74 @@ Value getProducerOfTensor(Value tensor) {
 
 **Scenario 1: Successful Authentication**
 ```
-// Initial state
+# Initial state
 Input: username="alice", password="Secret123!"
 
-// Execution path
+# Execution path
 Step 1: db.find_user("alice")
    → Query database
    → Return User(id=42, username="alice", password_hash="$2b$12$KIX...")
-   // At this point: user exists, continue execution
+   # At this point: user exists, skip Scenario 1's return None
 
-Step 2: Enter Scenario 2 branch (user exists), skip Scenario 1's return None
-
-Step 3: verify_password("Secret123!", "$2b$12$KIX...")
+Step 2: Enter Scenario 2 branch (password verification)
+   → verify_password("Secret123!", "$2b$12$KIX...")
    → Extract salt: $2b$12$KIX...
    → Hash "Secret123!" with salt
    → Constant-time compare hashes
    → Return True
 
-Step 4: generate_token(42)
+Step 3: generate_token(42)
    → Create payload: {"user_id": 42, "exp": 1643723400}
    → Sign with private key
    → Return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
-   // Final return: Token string
+   # Final return: Token string
 
-// Performance analysis
+# Performance analysis
 Duration: ~100ms (mainly bcrypt computation)
 ```
 
 **Scenario 2: User Doesn't Exist**
 ```
-// Initial state
+# Initial state
 Input: username="bob", password="anything"
 
-// Execution path
+# Execution path
 Step 1: db.find_user("bob")
    → Query database
    → Return None
-   // At this point: user = None, enter Scenario 1 branch
+   # At this point: user = None, enter Scenario 1 branch
 
-Step 2: if not user: // true
+Step 2: if not user: # true
    → Return None immediately
-   // Scenarios 2, 3 not executed
+   # Scenarios 2, 3 not executed
 
-// Performance analysis
+# Performance analysis
 Duration: ~5ms (database query only)
 ⚠️ Note: Much faster than successful auth, may leak user existence
-// Security recommendation: Add fixed delay or fake hash to make durations similar
+# Security recommendation: Add fixed delay or fake hash to make durations similar
 ```
 
 **Scenario 3: Wrong Password**
 ```
-// Initial state
+# Initial state
 Input: username="alice", password="WrongPass"
 
-// Execution path
+# Execution path
 Step 1: db.find_user("alice")
    → Return User(id=42, ...)
-   // At this point: user exists, skip Scenario 1 branch
+   # At this point: user exists, skip Scenario 1's return None
 
-Step 2: Skip Scenario 1's return None
-
-Step 3: verify_password("WrongPass", "$2b$12$KIX...")
+Step 2: Enter Scenario 2 branch (password verification)
+   → verify_password("WrongPass", "$2b$12$KIX...")
    → Hash "WrongPass"
    → Compare hashes
    → Return False
 
-Step 4: if branch is false, don't execute generate_token
+Step 3: Password verification failed, don't execute generate_token
    → Continue to final return None
-   // Scenario 3: Password verification failed, return None
+   # Scenario 3: Password verification failed, return None
 
-// Performance analysis
+# Performance analysis
 Duration: ~100ms (similar to successful auth)
 ✅ Benefit: Cannot determine password correctness by response time
 ```

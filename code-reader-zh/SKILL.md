@@ -564,76 +564,74 @@ Value getProducerOfTensor(Value tensor) {
 
 **场景 1：认证成功**
 ```
-// 初始状态
+# 初始状态
 输入：username="alice", password="Secret123!"
 
-// 执行路径
+# 执行路径
 步骤 1: db.find_user("alice")
    → 查询数据库
    → 返回 User(id=42, username="alice", password_hash="$2b$12$KIX...")
-   // 此时：user 存在，继续执行
+   # 此时：user 存在，跳过场景 1 的 return None
 
-步骤 2: 进入场景 1 分支（用户存在），跳过场景 2 的 return None
-
-步骤 3: verify_password("Secret123!", "$2b$12$KIX...")
+步骤 2: 进入场景 2 分支（密码验证）
+   → verify_password("Secret123!", "$2b$12$KIX...")
    → 提取盐值：$2b$12$KIX...
    → 哈希 "Secret123!" with salt
    → 恒定时间比较哈希值
    → 返回 True
 
-步骤 4: generate_token(42)
+步骤 3: generate_token(42)
    → 创建 payload: {"user_id": 42, "exp": 1643723400}
    → 使用私钥签名
    → 返回 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
-   // 最终返回：Token 字符串
+   # 最终返回：Token 字符串
 
-// 性能分析
+# 性能分析
 耗时：~100ms（主要是 bcrypt 计算）
 ```
 
 **场景 2：用户不存在**
 ```
-// 初始状态
+# 初始状态
 输入：username="bob", password="anything"
 
-// 执行路径
+# 执行路径
 步骤 1: db.find_user("bob")
    → 查询数据库
    → 返回 None
-   // 此时：user = None，进入场景 1 分支
+   # 此时：user = None，进入场景 1 分支
 
-步骤 2: if not user: // true
+步骤 2: if not user: # true
    → 直接返回 None
-   // 场景 2、3 都不执行
+   # 场景 2、3 都不执行
 
-// 性能分析
+# 性能分析
 耗时：~5ms（仅数据库查询）
 ⚠️ 注意：比认证成功快得多，可能泄露用户是否存在
-// 安全建议：添加固定延迟或假哈希计算，使两种情况耗时接近
+# 安全建议：添加固定延迟或假哈希计算，使两种情况耗时接近
 ```
 
 **场景 3：密码错误**
 ```
-// 初始状态
+# 初始状态
 输入：username="alice", password="WrongPass"
 
-// 执行路径
+# 执行路径
 步骤 1: db.find_user("alice")
    → 返回 User(id=42, ...)
-   // 此时：user 存在，跳过场景 1 分支
+   # 此时：user 存在，跳过场景 1 的 return None
 
-步骤 2: 跳过场景 1 的 return None
-
-步骤 3: verify_password("WrongPass", "$2b$12$KIX...")
+步骤 2: 进入场景 2 分支（密码验证）
+   → verify_password("WrongPass", "$2b$12$KIX...")
    → 哈希 "WrongPass"
    → 比较哈希值
    → 返回 False
 
-步骤 4: if 分支为 false，不执行 generate_token
+步骤 3: 密码验证失败，不执行 generate_token
    → 继续执行到最后的 return None
-   // 场景 3：密码验证失败，返回 None
+   # 场景 3：密码验证失败，返回 None
 
-// 性能分析
+# 性能分析
 耗时：~100ms（与认证成功相近）
 ✅ 好处：无法通过响应时间判断密码是否正确
 ```
