@@ -475,13 +475,18 @@ def authenticate_user(username, password):
 **Line-by-Line Detailed Analysis (Recommended Comment Style: Scenario-Based + Execution Flow Tracking)**
 
 > **Comment Style Guide:**
-> - Use `// Scenario N: [description]` to label different branch scenarios
-> - Track execution flow with concrete variable values
+> - **`// Scenario N: [description]`** - Label different execution paths in conditional branches (if/else, switch, match, etc.)
+> - **`// Step N: [description]`** - Label sequential execution flow (initialization order, function call sequence, etc.)
+> - Track execution flow with concrete variable values (`// At this point: xxx`)
 > - Annotate loop/recursion iteration states
 > - Mark key data transformation trajectories
 
 ```python
 def authenticate_user(username, password):
+    // Step 1: Query user
+    user = db.find_user(username)
+    // WHY query user first: Avoid password hashing for non-existent usernames (save computation)
+
     // Scenario 1: If user doesn't exist, return None immediately
     if not user:
         return None
@@ -562,20 +567,20 @@ Value getProducerOfTensor(Value tensor) {
 Input: username="alice", password="Secret123!"
 
 // Execution path
-1. db.find_user("alice")
+Step 1: db.find_user("alice")
    → Query database
    → Return User(id=42, username="alice", password_hash="$2b$12$KIX...")
    // At this point: user exists, continue execution
 
-2. Enter Scenario 1 branch (user exists), skip Scenario 2's return None
+Step 2: Enter Scenario 2 branch (user exists), skip Scenario 1's return None
 
-3. verify_password("Secret123!", "$2b$12$KIX...")
+Step 3: verify_password("Secret123!", "$2b$12$KIX...")
    → Extract salt: $2b$12$KIX...
    → Hash "Secret123!" with salt
    → Constant-time compare hashes
    → Return True
 
-4. generate_token(42)
+Step 4: generate_token(42)
    → Create payload: {"user_id": 42, "exp": 1643723400}
    → Sign with private key
    → Return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
@@ -591,14 +596,14 @@ Duration: ~100ms (mainly bcrypt computation)
 Input: username="bob", password="anything"
 
 // Execution path
-1. db.find_user("bob")
+Step 1: db.find_user("bob")
    → Query database
    → Return None
-   // At this point: user = None, enter Scenario 2 branch
+   // At this point: user = None, enter Scenario 1 branch
 
-2. if not user: // true
+Step 2: if not user: // true
    → Return None immediately
-   // Scenarios 1, 3 not executed
+   // Scenarios 2, 3 not executed
 
 // Performance analysis
 Duration: ~5ms (database query only)
@@ -612,18 +617,18 @@ Duration: ~5ms (database query only)
 Input: username="alice", password="WrongPass"
 
 // Execution path
-1. db.find_user("alice")
+Step 1: db.find_user("alice")
    → Return User(id=42, ...)
-   // At this point: user exists, enter Scenario 1 branch
+   // At this point: user exists, skip Scenario 1 branch
 
-2. Skip Scenario 2's return None
+Step 2: Skip Scenario 1's return None
 
-3. verify_password("WrongPass", "$2b$12$KIX...")
+Step 3: verify_password("WrongPass", "$2b$12$KIX...")
    → Hash "WrongPass"
    → Compare hashes
    → Return False
 
-4. if branch is false, don't execute generate_token
+Step 4: if branch is false, don't execute generate_token
    → Continue to final return None
    // Scenario 3: Password verification failed, return None
 

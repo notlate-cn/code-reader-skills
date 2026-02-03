@@ -475,13 +475,18 @@ def authenticate_user(username, password):
 **逐行精细解析（推荐注释风格）：场景化 + 执行流追踪**
 
 > **注释风格说明：**
-> - 使用 `// 场景 N: [描述]` 标注不同分支场景
-> - 用具体变量值追踪执行流程
+> - **`// 场景 N: [描述]`** - 标注条件分支的不同执行路径（if/else、switch、match 等）
+> - **`// 步骤 N: [描述]`** - 标注串行执行流程（初始化顺序、函数调用序列等）
+> - 用具体变量值追踪执行流程（`// 此时：xxx`）
 > - 注明循环/递归的迭代状态
 > - 标注关键数据的变化轨迹
 
 ```python
 def authenticate_user(username, password):
+    // 步骤 1: 查询用户
+    user = db.find_user(username)
+    // WHY 先查用户：避免不存在的用户名也进行密码哈希（节省计算）
+
     // 场景 1: 若用户不存在，立即返回 None
     if not user:
         return None
@@ -562,20 +567,20 @@ Value getProducerOfTensor(Value tensor) {
 输入：username="alice", password="Secret123!"
 
 // 执行路径
-1. db.find_user("alice")
+步骤 1: db.find_user("alice")
    → 查询数据库
    → 返回 User(id=42, username="alice", password_hash="$2b$12$KIX...")
    // 此时：user 存在，继续执行
 
-2. 进入场景 1 分支（用户存在），跳过场景 2 的 return None
+步骤 2: 进入场景 1 分支（用户存在），跳过场景 2 的 return None
 
-3. verify_password("Secret123!", "$2b$12$KIX...")
+步骤 3: verify_password("Secret123!", "$2b$12$KIX...")
    → 提取盐值：$2b$12$KIX...
    → 哈希 "Secret123!" with salt
    → 恒定时间比较哈希值
    → 返回 True
 
-4. generate_token(42)
+步骤 4: generate_token(42)
    → 创建 payload: {"user_id": 42, "exp": 1643723400}
    → 使用私钥签名
    → 返回 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0Miwi..."
@@ -591,14 +596,14 @@ Value getProducerOfTensor(Value tensor) {
 输入：username="bob", password="anything"
 
 // 执行路径
-1. db.find_user("bob")
+步骤 1: db.find_user("bob")
    → 查询数据库
    → 返回 None
-   // 此时：user = None，进入场景 2 分支
+   // 此时：user = None，进入场景 1 分支
 
-2. if not user: // true
+步骤 2: if not user: // true
    → 直接返回 None
-   // 场景 1、3 都不执行
+   // 场景 2、3 都不执行
 
 // 性能分析
 耗时：~5ms（仅数据库查询）
@@ -612,18 +617,18 @@ Value getProducerOfTensor(Value tensor) {
 输入：username="alice", password="WrongPass"
 
 // 执行路径
-1. db.find_user("alice")
+步骤 1: db.find_user("alice")
    → 返回 User(id=42, ...)
-   // 此时：user 存在，进入场景 1 分支
+   // 此时：user 存在，跳过场景 1 分支
 
-2. 跳过场景 2 的 return None
+步骤 2: 跳过场景 1 的 return None
 
-3. verify_password("WrongPass", "$2b$12$KIX...")
+步骤 3: verify_password("WrongPass", "$2b$12$KIX...")
    → 哈希 "WrongPass"
    → 比较哈希值
    → 返回 False
 
-4. if 分支为 false，不执行 generate_token
+步骤 4: if 分支为 false，不执行 generate_token
    → 继续执行到最后的 return None
    // 场景 3：密码验证失败，返回 None
 
