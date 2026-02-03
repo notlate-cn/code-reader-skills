@@ -475,37 +475,38 @@ def authenticate_user(username, password):
 **逐行精细解析（推荐注释风格）：场景化 + 执行流追踪**
 
 > **注释风格说明：**
-> - **`// 场景 N: [描述]`** - 标注条件分支的不同执行路径（if/else、switch、match 等）
-> - **`// 步骤 N: [描述]`** - 标注串行执行流程（初始化顺序、函数调用序列等）
-> - 用具体变量值追踪执行流程（`// 此时：xxx`）
+> - **`# 场景 N: [描述]` / `// 场景 N: [描述]`** - 标注条件分支的不同执行路径（if/else、switch、match 等）
+> - **`# 步骤 N: [描述]` / `// 步骤 N: [描述]`** - 标注串行执行流程（初始化顺序、函数调用序列等）
+> - 注释符号与语言一致：Python 用 `#`，C++/Java 用 `//`
+> - 用具体变量值追踪执行流程（`# 此时：xxx` / `// 此时：xxx`）
 > - 注明循环/递归的迭代状态
 > - 标注关键数据的变化轨迹
 
 ```python
 def authenticate_user(username, password):
-    // 步骤 1: 查询用户
+    # 步骤 1: 查询用户
     user = db.find_user(username)
-    // WHY 先查用户：避免不存在的用户名也进行密码哈希（节省计算）
+    # WHY 先查用户：避免不存在的用户名也进行密码哈希（节省计算）
 
-    // 场景 1: 若用户不存在，立即返回 None
+    # 场景 1: 若用户不存在，立即返回 None
     if not user:
         return None
-        // WHY 返回 None 而非抛异常：认证失败是正常业务流程，非异常情况
-        // WHY 不区分"用户不存在"和"密码错误"：防止用户名枚举攻击
+        # WHY 返回 None 而非抛异常：认证失败是正常业务流程，非异常情况
+        # WHY 不区分"用户不存在"和"密码错误"：防止用户名枚举攻击
 
-    // 场景 2: 若密码验证通过，生成并返回 Token
+    # 场景 2: 若密码验证通过，生成并返回 Token
     if verify_password(password, user.password_hash):
-        // verify_password 内部流程：
-        //   1. 从 password_hash 提取盐值 (Salt)
-        //   2. 用相同盐值哈希明文密码
-        //   3. 恒定时间比较两个哈希值（防止时序攻击）
+        # verify_password 内部流程：
+        #   1. 从 password_hash 提取盐值 (Salt)
+        #   2. 用相同盐值哈希明文密码
+        #   3. 恒定时间比较两个哈希值（防止时序攻击）
         return generate_token(user.id)
-        // 此时：user.id = 42（假设）
-        // generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        # 此时：user.id = 42（假设）
+        # generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-    // 场景 3: 密码错误，返回 None
+    # 场景 3: 密码错误，返回 None
     return None
-    // WHY 与"用户不存在"相同的返回值：防止攻击者区分两种失败情况
+    # WHY 与"用户不存在"相同的返回值：防止攻击者区分两种失败情况
 ```
 
 **完整执行流示例（多场景追踪）：**

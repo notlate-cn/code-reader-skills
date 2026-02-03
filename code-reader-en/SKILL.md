@@ -475,37 +475,38 @@ def authenticate_user(username, password):
 **Line-by-Line Detailed Analysis (Recommended Comment Style: Scenario-Based + Execution Flow Tracking)**
 
 > **Comment Style Guide:**
-> - **`// Scenario N: [description]`** - Label different execution paths in conditional branches (if/else, switch, match, etc.)
-> - **`// Step N: [description]`** - Label sequential execution flow (initialization order, function call sequence, etc.)
-> - Track execution flow with concrete variable values (`// At this point: xxx`)
+> - **`# Scenario N: [description]` / `// Scenario N: [description]`** - Label different execution paths in conditional branches (if/else, switch, match, etc.)
+> - **`# Step N: [description]` / `// Step N: [description]`** - Label sequential execution flow (initialization order, function call sequence, etc.)
+> - Comment symbols match language: Python uses `#`, C++/Java use `//`
+> - Track execution flow with concrete variable values (`# At this point: xxx` / `// At this point: xxx`)
 > - Annotate loop/recursion iteration states
 > - Mark key data transformation trajectories
 
 ```python
 def authenticate_user(username, password):
-    // Step 1: Query user
+    # Step 1: Query user
     user = db.find_user(username)
-    // WHY query user first: Avoid password hashing for non-existent usernames (save computation)
+    # WHY query user first: Avoid password hashing for non-existent usernames (save computation)
 
-    // Scenario 1: If user doesn't exist, return None immediately
+    # Scenario 1: If user doesn't exist, return None immediately
     if not user:
         return None
-        // WHY return None not exception: Auth failure is normal flow, not exceptional
-        // WHY not distinguish "user doesn't exist" from "wrong password": Prevent username enumeration
+        # WHY return None not exception: Auth failure is normal flow, not exceptional
+        # WHY not distinguish "user doesn't exist" from "wrong password": Prevent username enumeration
 
-    // Scenario 2: If password verification passes, generate and return Token
+    # Scenario 2: If password verification passes, generate and return Token
     if verify_password(password, user.password_hash):
-        // verify_password internal flow:
-        //   1. Extract salt from password_hash
-        //   2. Hash plaintext password with same salt
-        //   3. Constant-time compare hashes (prevent timing attack)
+        # verify_password internal flow:
+        #   1. Extract salt from password_hash
+        #   2. Hash plaintext password with same salt
+        #   3. Constant-time compare hashes (prevent timing attack)
         return generate_token(user.id)
-        // At this point: user.id = 42 (assumed)
-        // generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        # At this point: user.id = 42 (assumed)
+        # generate_token(42) → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-    // Scenario 3: Wrong password, return None
+    # Scenario 3: Wrong password, return None
     return None
-    // WHY same return value as "user doesn't exist": Prevent attackers from distinguishing failures
+    # WHY same return value as "user doesn't exist": Prevent attackers from distinguishing failures
 ```
 
 **Complete Execution Flow Example (Multi-Scenario Tracking):**
