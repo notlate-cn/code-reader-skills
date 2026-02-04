@@ -9,33 +9,13 @@ Professional code analysis tool based on cognitive science research, supporting 
 
 ## Three Analysis Modes
 
-**Quick Mode** - Efficient overview, 5-10 minutes
-- Fast understanding of code structure and functionality
-- Best for code reviews, quick browsing
-
-**Standard Mode** - Balanced understanding ⭐ Recommended, 15-20 minutes
-- Understand WHY and design rationale
-- Best for learning new tech, code comprehension
-
-**Deep Mode** - Complete mastery, 30+ minutes
-- Application transfer testing + quality verification
-- Best for interview prep, deep research
+| User Intent | Recommended Mode | Trigger Examples | Duration |
+|-------------|-----------------|------------------|----------|
+| Quick browse/code review | Quick Mode | "quickly analyze", "briefly look", "what does this do" | 5-10 min |
+| Learning/technical research | Standard Mode ⭐ | "deeply analyze", "help me understand", "explain principles" | 15-20 min |
+| Interview prep/complete mastery | Deep Mode | "thoroughly analyze", "I need to master this", "interview related" | 30+ min |
 
 **Default: Standard Mode unless user specifies otherwise.**
-
----
-
-## Mode Selection Guide
-
-Before starting analysis, automatically select mode based on user intent:
-
-| User Intent | Recommended Mode | Trigger Examples |
-|-------------|-----------------|------------------|
-| Quick browse/code review | Quick | "quickly analyze", "briefly look", "what does this do" |
-| Learning/technical research | Standard | "deeply analyze", "help me understand", "explain principles" |
-| Interview prep/complete mastery | Deep | "thoroughly analyze", "I need to master this", "interview related" |
-
-**If user doesn't specify, default to Standard Mode.**
 
 ---
 
@@ -271,70 +251,6 @@ Function: DeepModeProgressiveGeneration(code, filePath):
 ---
 
 ## Analysis Workflow (Research-Driven)
-
-### 🔄 Sub-Agent Usage Guidelines (Optional Optimization)
-
-**When to Use:**
-- Standard/Deep Mode analyzing complex code
-- Need to process independent tasks in parallel
-- Single chapter content > 1000 words
-
-**Sub-Agent Type Selection:**
-| Agent Type | Use Case | Example |
-|-----------|----------|---------|
-| `Explore` | Multi-round exploration, discover hidden relationships | Quick overview, concept network, dependency exploration |
-| `general-purpose` | Single analysis, need precise output | Algorithm analysis, design patterns, code parsing, quality verification |
-
-**Parallel Processing Strategy:**
-
-```
-Serial dependency chain (must maintain):
-Step1 → Step2 → Step3 → Step6 → Step9
-
-Parallelizable tasks:
-├─ Step4(Algorithms) ∥ Step5(Patterns)
-└─ Step7.1(Scenario1) ∥ Step7.2(Scenario2)
-```
-
-**Hybrid Parallel Flow (Recommended):**
-
-```markdown
-# Standard/Deep Mode Parallel Optimization
-
-1. Serial: Quick Overview → Background & Motivation → Concept Network
-2. Parallel: [Algorithm Analysis, Pattern Analysis]
-3. Serial: Key Code Analysis (depends on previous results)
-4. Parallel: [Transfer Scenario1, Transfer Scenario2]
-5. Serial: Quality Verification
-
-# Pseudocode example
-# Steps 4-5 in parallel
-[AlgoResult, PatternResult] = ParallelRun(
-  Task("Algorithm Analysis", {Concepts}),
-  Task("Pattern Analysis", {Concepts})
-)
-
-# Step 7 scenarios in parallel
-[Scenario1, Scenario2] = ParallelRun(
-  Task("Application Transfer-Scenario1", {Concepts}),
-  Task("Application Transfer-Scenario2", {Concepts})
-)
-```
-
-**When to Use Sub-Agents:**
-| Condition | Use |
-|-----------|-----|
-| Quick Mode | ❌ Serial is fine, less content |
-| Standard Mode + Simple Code | ❌ Serial is fine |
-| Standard Mode + Complex Code | ✅ Moderate parallelism |
-| Deep Mode | ✅ Heavy parallelism + progressive generation |
-
-**Token Considerations:**
-- Sub-agents increase total token consumption (context duplication)
-- Only use when parallel benefit > overhead
-- For Deep Mode progressive generation, consider using separate sub-agent per chapter
-
----
 
 ### Step 1: Quick Overview
 
@@ -1292,84 +1208,11 @@ Before starting analysis, confirm:
       - List all file paths
    ```
 
-   **Method 3: Progressive generation for extra-long analysis (Deep Mode Only)**
+   **Method 3: Progressive generation (Deep Mode only)**
    ```
-   For: Complex code with analysis over 5000 words
+   For: Complex code with analysis expected over 5000 words
 
-   Step 1: Generate framework
-   ```
-   Write: [name]-analysis.md
-   Content:
-     # [Code Name] Deep Analysis
-
-     ## 1. Quick Overview
-     [To be filled...]
-
-     ## 2. Background & Motivation
-     [To be filled...]
-
-     ## 3. Core Concepts
-     [To be filled...]
-
-     ... (full TOC)
-   ```
-
-   Step 2: Fill chapter by chapter (each generated independently for depth)
-   ```
-   # Read current file
-   currentContent = Read([name]-analysis.md)
-
-   # Generate single chapter (focus on depth)
-   chapter1_content = DeepGenerate("1. Quick Overview", code)
-   # Requirement: ≥ 300 words, include language/scale/dependencies/type
-
-   # Replace placeholder
-   newContent = currentContent.replace("[To be filled...]", chapter1_content)
-   Write([name]-analysis.md, newContent)
-
-   # Repeat step 2 for all chapters
-   ```
-
-   Step 3: Depth validation and supplementation
-   ```
-   # Read complete document
-   fullContent = Read([name]-analysis.md)
-
-   # Self-check each chapter
-   for each chapter in fullContent:
-     if chapter.length < 300:
-       # Supplement details
-       chapter = AppendDetails(chapter)
-     if "WHY" not in chapter:
-       # Add WHY analysis
-       chapter = Add_Why(chapter)
-     if chapter has code_block:
-       # Check comment completeness
-       if CommentsIncomplete(chapter):
-         chapter = AddDetailedComments(chapter)
-
-   # Write final document
-   Write([name]-analysis.md, fullContent)
-   ```
-
-   Step 4: Output summary
-   ```
-   ## Analysis Complete
-
-   **Mode:** Deep Mode (Progressive Generation)
-   **Document:** `[name]-analysis.md`
-   **Chapters:** 9 (all filled with depth)
-   **Word Count:** ~ 8000 words
-
-   **Key Findings:** ...
-   ```
-
-   **Advantages of Progressive Generation:**
-   - ✅ Each chapter generated independently, avoid late-stage compression
-   - ✅ Can target supplementation of weak chapters
-   - ✅ Ensure every WHY has sufficient explanation
-   - ✅ Code comments complete (Scenario/Step + WHY)
-   - ✅ Execution flows have concrete data tracking
+   See "Deep Mode Output Structure - Progressive Generation Flow" section above for details
    ```
 
 3. **Conversation Output Format (Brief)**
