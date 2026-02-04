@@ -5,7 +5,7 @@
 **基于认知科学的源代码深度理解工具 | Cognitive Science-Based Code Analysis Tool**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
+[![Version](https://img.shields.io/badge/version-2.2.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
 [![Claude Skills](https://img.shields.io/badge/Claude-Skills-orange.svg)](https://claude.ai)
 [![Language](https://img.shields.io/badge/language-中文%20%7C%20English-red.svg)](#)
 
@@ -105,7 +105,7 @@ with open('code-reader-zh/SKILL.md', 'r', encoding='utf-8') as f:
 
 client = anthropic.Anthropic()
 message = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-20250514",  # 或使用最新可用模型
     system=skill_content,  # 将 skill 作为系统提示
     messages=[
         {"role": "user", "content": "深入分析这段代码：\n\n[你的代码]"}
@@ -150,15 +150,17 @@ message = client.messages.create(
 4. 📌 核心概念说明
 5. 📐 算法与理论
 6. 🏗️ 设计模式
-7. 💻 关键代码深度解析
+7. 💻 关键代码深度解析（场景化注释）
 8. 📦 依赖与使用示例
 
 #### Deep Mode（完全掌握）
 [包含 Standard Mode 所有内容，加上]
 - 🔗 概念网络图
-- 📊 完整执行示例
+- 📊 完整执行示例（多场景追踪）
 - 🚀 应用迁移场景（至少 2 个）
 - ✅ 质量验证清单
+- 📝 渐进式生成（确保深度）
+- 💾 直接写入文件（Token 优化）
 
 ### 💡 使用示例
 
@@ -241,6 +243,24 @@ def authenticate_user(username, password):
 </details>
 
 ### 📝 更新日志
+
+#### v2.2.0 (2026-02-04)
+
+**新增功能：**
+- ✨ 场景化注释风格（场景 N / 步骤 N）
+- ✨ Token 优化策略（直接写入文件）
+- ✨ 渐进式生成（Deep Mode 专用）
+- ✨ 多语言注释支持规范
+
+**改进：**
+- 📦 优化文档结构，删除重复内容
+- 📖 统一章节深度自检标准
+- 🎯 完善执行流示例格式
+
+**优化：**
+- 🔧 文件大小：1500 → 1342 行 (-10.5%)
+- ⚡ 删除子 Agent 使用规范
+- 📝 合并重复的模式选择说明
 
 #### v2.1.0 (2026-01-31)
 
@@ -405,15 +425,17 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 4. Core Concepts
 5. Algorithm & Theory
 6. Design Patterns
-7. Key Code Deep Analysis
+7. Key Code Deep Analysis (Scenario-based comments)
 8. Dependencies & Usage Examples
 
 #### Deep Mode
 [All Standard Mode content, plus]
 - Concept Network Diagram
-- Complete Execution Examples
+- Complete Execution Examples (Multi-scenario tracking)
 - Application Transfer Scenarios (at least 2)
 - Quality Verification Checklist
+- Progressive Generation (Ensure depth)
+- Direct File Writing (Token optimized)
 
 ### 🔬 Research Foundation
 
@@ -462,6 +484,24 @@ Contributions are welcome! Here's how to participate:
 </details>
 
 ### 📝 Changelog
+
+#### v2.2.0 (2026-02-04)
+
+**New Features:**
+- ✨ Scenario-based comment style (Scenario N / Step N)
+- ✨ Token optimization strategy (direct file writing)
+- ✨ Progressive generation (Deep Mode only)
+- ✨ Multi-language comment support standards
+
+**Improvements:**
+- 📦 Optimized document structure, removed duplicates
+- 📖 Unified chapter depth self-check standards
+- 🎯 Enhanced execution flow example format
+
+**Optimizations:**
+- 🔧 File size: 1500 → 1342 lines (-10.5%)
+- ⚡ Removed Sub-Agent usage guidelines
+- 📝 Merged duplicate mode selection sections
 
 #### v2.1.0 (2026-01-31)
 
