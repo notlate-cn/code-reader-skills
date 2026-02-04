@@ -1084,46 +1084,121 @@ Before starting analysis, confirm:
 
 ---
 
-## 📤 Output Requirements
+## 📤 Output Requirements (Token-Optimized)
 
 **After analysis completion, you MUST generate a standalone Markdown document!**
+
+### ⚡ Token-Saving Strategies
+
+**Core Principle: Avoid duplicate output, write directly to file**
+
+1. **Never output full analysis in conversation**
+   - Write complete analysis directly to file, don't output to conversation
+   - In conversation, output only: analysis summary + file path
+
+2. **Chunk large projects**
+   - Single file analysis: Generate single document
+   - Multi-file projects: Generate multiple documents by module
+   - Extra-long analysis: Split into `overview.md` + `[module]-detailed-analysis.md`
+
+3. **Progressive generation** (for Deep Mode)
+   - First generate framework document (TOC + summary)
+   - Fill sections incrementally, update file with each Write call
 
 ### Document Generation Rules
 
 1. **File Naming Format**
-   - Format: `[code-name]-deep-analysis.md`
+   - Single file: `[code-name]-deep-analysis.md`
+   - Multi-file project: `[project-name]-overview.md` + `[module-name]-analysis.md`
    - Examples: `jwt-auth-deep-analysis.md`, `quicksort-deep-analysis.md`
 
-2. **Generation Method**
-   - **Method 1 (Recommended)**: Use Write tool to create file
-     ```
-     After completing analysis, use Write tool to write complete analysis to a separate file
-     ```
+2. **Generation Method (Token-Optimized Flow)**
 
-   - **Method 2**: Ask user for save path
-     ```
-     After completing analysis, ask user for desired file path, then use Write tool to generate
-     ```
+   **Method 1: Direct write (Recommended)**
+   ```
+   User: Deeply analyze this code
 
-3. **File Content**
-   - Complete analysis results (according to selected mode's output structure)
-   - Use Markdown format
-   - Preserve all formatting (headers, tables, code blocks, lists, etc.)
+   1. [Complete analysis process, don't output full content]
 
-### Output Workflow Example
+   2. Use Write tool to generate document directly:
+      File path: [code-name]-deep-analysis.md
+      Content: [Complete analysis content]
 
+   3. Output brief summary in conversation:
+      - Analysis mode: Standard/Deep
+      - Key findings: 3-5 bullet points
+      - File path: [code-name]-deep-analysis.md
+   ```
+
+   **Method 2: Multi-file project chunking**
+   ```
+   1. [Complete overall analysis]
+
+   2. Generate overview document:
+      Write: [project-name]-overview.md
+      Content: Overall architecture, module relationship diagram, analysis framework
+
+   3. Generate detailed documents per module:
+      Write: [moduleA]-analysis.md
+      Write: [moduleB]-analysis.md
+      Write: [moduleC]-analysis.md
+
+   4. Output summary:
+      - Generated 4 documents
+      - List all file paths
+   ```
+
+   **Method 3: Progressive generation for extra-long analysis**
+   ```
+   1. Generate framework: [name]-analysis.md (with TOC and section placeholders)
+
+   2. Fill sections incrementally:
+      - Read file
+      - Append new section content
+      - Write back to file
+
+   3. Inform user when complete
+   ```
+
+3. **Conversation Output Format (Brief)**
+
+   ```markdown
+   ## Analysis Complete
+
+   **Mode:** Standard Mode
+
+   **Key Findings:**
+   - Code implements [core functionality]
+   - Uses [algorithm/pattern] to solve [problem]
+   - Key optimizations: [opt1], [opt2]
+   - Potential issues: [issue1], [issue2]
+
+   **Full Document:** `[code-name]-deep-analysis.md`
+   ```
+
+### Output Flow Comparison
+
+**❌ High Token Consumption (Avoid):**
 ```
-User: Deeply analyze this code
-
-1. [Complete analysis process]
-
-2. [Show analysis summary in conversation]
-
-3. Use Write tool to generate complete document:
-   File path: [code-name]-deep-analysis.md
-   Content: [Complete analysis content]
-
-4. Inform user: "Complete analysis saved to [file path]"
+1. Output 5000 token complete analysis in conversation
+2. Write 5000 token to file again
+→ Total: 10000+ token output
 ```
 
-**Important: Don't just output analysis in conversation - you MUST generate a saveable Markdown file!**
+**✅ Token-Optimized (Recommended):**
+```
+1. Write 5000 token directly to file
+2. Output 200 token summary in conversation
+→ Total: 5200 token output (~50% saved)
+```
+
+### Large Project Chunking Guide
+
+| Project Scale | Generation Strategy | File Structure |
+|--------------|---------------------|----------------|
+| < 500 lines | Single document | `[name]-analysis.md` |
+| 500-2000 lines | Single document (may be long) | `[name]-analysis.md` |
+| 2000-10000 lines | By module | `[project]-overview.md` + `[module]-analysis.md` (3-5 files) |
+| > 10000 lines | Layered + by module | `[project]-architecture.md` + `[project]-overview.md` + `[module]-analysis.md` (multiple) |
+
+**Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
