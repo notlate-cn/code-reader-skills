@@ -159,7 +159,9 @@ Before starting analysis, automatically select mode based on user intent:
 - Detailed WHY comments
 ```
 
-### Deep Mode Output Structure (30+ min)
+### Deep Mode Output Structure (30+ min) - Progressive Generation
+
+**Use progressive generation strategy to ensure every chapter has sufficient depth:**
 
 ```markdown
 # [Code Name] Complete Mastery Analysis
@@ -186,6 +188,84 @@ Before starting analysis, automatically select mode based on user intent:
 - Technical accuracy verification
 - Practicality verification
 - Final "four abilities" test
+```
+
+**Progressive Generation Flow (Deep Mode Exclusive):**
+
+| Phase | Operation | Depth Assurance Mechanism |
+|-------|-----------|--------------------------|
+| **1. Framework** | Generate full TOC + chapter placeholders | Plan structure upfront, avoid omissions |
+| **2. Fill Chapters** | Process each chapter sequentially | Focus on one chapter at a time, fully develop |
+| **3. Depth Check** | Self-check after each chapter | Verify Deep Mode standards met |
+| **4. Reinforce** | Append content to weak chapters | Targeted supplementation of insufficient parts |
+
+**Depth Standards for Each Chapter:**
+
+```markdown
+## Depth Self-Check Checklist (After Each Chapter)
+
+### Content Completeness
+- [ ] All chapter subsections covered (no "skipped" or "same as above")
+- [ ] Every WHY has specific explanation (not just one sentence)
+- [ ] Code examples have complete comments (Scenario/Step + WHY)
+
+### Analysis Depth
+- [ ] Core concepts have 3 WHYs fully answered
+- [ ] Algorithms have complexity analysis + rationale
+- [ ] Design patterns have WHY used + what happens without
+- [ ] Execution flows have concrete data tracking
+
+### Practicality
+- [ ] Error-prone points marked
+- [ ] Boundary conditions explained
+- [ ] At least 2 application transfer scenarios
+```
+
+**Implementation (Pseudocode Flow):**
+
+```
+Function: DeepModeProgressiveGeneration(code, filePath):
+
+  // Phase 1: Generate framework
+  framework = GenerateFullTOC(StandardStructure + DeepExtensions)
+  WriteFile(filePath, framework)
+
+  // Phase 2: Fill chapter by chapter
+  chapters = [
+    "1. Quick Overview",
+    "2. Background & Motivation",
+    "3. Core Concepts",
+    "4. Algorithm & Theory",
+    "5. Design Patterns",
+    "6. Key Code Deep Analysis",
+    "7. Application Transfer",
+    "8. Dependencies",
+    "9. Quality Verification"
+  ]
+
+  for each chapter in chapters:
+    currentContent = ReadFile(filePath)
+
+    // Generate chapter content (single focus, ensure depth)
+    chapterContent = DeepGenerateChapter(chapter, code)
+    // Requirement: Each chapter ≥ 300-500 words, code has full comments
+
+    // Depth self-check
+    if not PassDepthCheck(chapterContent):
+      chapterContent = AppendDetails(chapterContent)
+
+    // Update file
+    newContent = currentContent.replace(chapterPlaceholder, chapterContent)
+    WriteFile(filePath, newContent)
+
+  // Phase 3: Overall validation
+  fullDoc = ReadFile(filePath)
+  if not PassOverallCheck(fullDoc):
+    weakChapters = IdentifyWeakParts(fullDoc)
+    for chapter in weakChapters:
+      SupplementContent(chapter)
+
+  return filePath
 ```
 
 ---
@@ -1148,16 +1228,84 @@ Before starting analysis, confirm:
       - List all file paths
    ```
 
-   **Method 3: Progressive generation for extra-long analysis**
+   **Method 3: Progressive generation for extra-long analysis (Deep Mode Only)**
    ```
-   1. Generate framework: [name]-analysis.md (with TOC and section placeholders)
+   For: Complex code with analysis over 5000 words
 
-   2. Fill sections incrementally:
-      - Read file
-      - Append new section content
-      - Write back to file
+   Step 1: Generate framework
+   ```
+   Write: [name]-analysis.md
+   Content:
+     # [Code Name] Deep Analysis
 
-   3. Inform user when complete
+     ## 1. Quick Overview
+     [To be filled...]
+
+     ## 2. Background & Motivation
+     [To be filled...]
+
+     ## 3. Core Concepts
+     [To be filled...]
+
+     ... (full TOC)
+   ```
+
+   Step 2: Fill chapter by chapter (each generated independently for depth)
+   ```
+   # Read current file
+   currentContent = Read([name]-analysis.md)
+
+   # Generate single chapter (focus on depth)
+   chapter1_content = DeepGenerate("1. Quick Overview", code)
+   # Requirement: ≥ 300 words, include language/scale/dependencies/type
+
+   # Replace placeholder
+   newContent = currentContent.replace("[To be filled...]", chapter1_content)
+   Write([name]-analysis.md, newContent)
+
+   # Repeat step 2 for all chapters
+   ```
+
+   Step 3: Depth validation and supplementation
+   ```
+   # Read complete document
+   fullContent = Read([name]-analysis.md)
+
+   # Self-check each chapter
+   for each chapter in fullContent:
+     if chapter.length < 300:
+       # Supplement details
+       chapter = AppendDetails(chapter)
+     if "WHY" not in chapter:
+       # Add WHY analysis
+       chapter = Add_Why(chapter)
+     if chapter has code_block:
+       # Check comment completeness
+       if CommentsIncomplete(chapter):
+         chapter = AddDetailedComments(chapter)
+
+   # Write final document
+   Write([name]-analysis.md, fullContent)
+   ```
+
+   Step 4: Output summary
+   ```
+   ## Analysis Complete
+
+   **Mode:** Deep Mode (Progressive Generation)
+   **Document:** `[name]-analysis.md`
+   **Chapters:** 9 (all filled with depth)
+   **Word Count:** ~ 8000 words
+
+   **Key Findings:** ...
+   ```
+
+   **Advantages of Progressive Generation:**
+   - ✅ Each chapter generated independently, avoid late-stage compression
+   - ✅ Can target supplementation of weak chapters
+   - ✅ Ensure every WHY has sufficient explanation
+   - ✅ Code comments complete (Scenario/Step + WHY)
+   - ✅ Execution flows have concrete data tracking
    ```
 
 3. **Conversation Output Format (Brief)**
@@ -1202,3 +1350,86 @@ Before starting analysis, confirm:
 | > 10000 lines | Layered + by module | `[project]-architecture.md` + `[project]-overview.md` + `[module]-analysis.md` (multiple) |
 
 **Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
+
+---
+
+### 📋 Chapter Depth Self-Check Standards (Ensure Quality)
+
+**For Deep Mode progressive generation, each chapter must pass these checks:**
+
+```markdown
+## Chapter Depth Self-Check Checklist
+
+### 1. Content Completeness (Required)
+- [ ] All chapter subsections covered (no "skipped", "see above", "same as above")
+- [ ] Every WHY has specific explanation (at least 2-3 sentences, not just one)
+- [ ] Code examples have complete comments (use Scenario/Step + WHY style)
+- [ ] References have source links (algorithms/patterns/theories)
+
+### 2. Analysis Depth (by Chapter Type)
+
+**Concept chapters (Chapter 3):**
+- [ ] Each core concept has 3 WHYs
+  - WHY this concept is needed
+  - WHY implemented this way
+  - WHY not other approaches
+
+**Algorithm chapters (Chapter 4):**
+- [ ] Has time/space complexity annotation
+- [ ] Has WHY choose this algorithm
+- [ ] Has WHY complexity is acceptable
+- [ ] Has degradation scenarios
+
+**Design pattern chapters (Chapter 5):**
+- [ ] Has pattern name and standard reference
+- [ ] Has WHY use this pattern
+- [ ] Has what happens without it
+
+**Code analysis chapters (Chapter 6):**
+- [ ] Has line-by-line analysis (what + WHY)
+- [ ] Has execution examples with concrete data
+- [ ] Has multi-scenario tracking (at least 2 scenarios)
+- [ ] Has error-prone points and boundary conditions
+
+### 3. Practicality (Application Value)
+- [ ] Error-prone points marked
+- [ ] Boundary conditions explained
+- [ ] At least 2 application transfer scenarios
+- [ ] Improvement suggestions have WHY
+
+### 4. Format Standards
+- [ ] Use Markdown format
+- [ ] Code blocks have language tags
+- [ ] Tables aligned correctly
+- [ ] List hierarchy clear
+
+### Handling Unqualified Chapters
+
+**Case A: Too little content (< 300 words)**
+→ Append details: Add more explanations, examples, comparisons
+
+**Case B: Insufficient WHY analysis**
+→ Supplement WHY: Ask "why" for each key point
+
+**Case C: Incomplete code comments**
+→ Add detailed comments: Use Scenario/Step + WHY style
+
+**Case D: Missing execution flows**
+→ Add concrete data examples: Track variable change trajectories
+```
+
+**Quick Depth Assessment Standards:**
+
+| Chapter | Min Words | Required Elements |
+|---------|-----------|-------------------|
+| 1. Quick Overview | 200 | Language, scale, dependencies, type |
+| 2. Background & Motivation | 400 | Problem essence, solution choice, scenarios |
+| 3. Core Concepts | 600 | Each concept 3 WHYs, relationship matrix |
+| 4. Algorithm & Theory | 500 | Complexity, WHY, references |
+| 5. Design Patterns | 400 | Pattern name, WHY, standard reference |
+| 6. Key Code Analysis | 800 | Line-by-line, execution examples, scenarios |
+| 7. Application Transfer | 500 | ≥ 2 scenarios, constant principles, modifications |
+| 8. Dependencies | 300 | WHY per dependency, usage examples |
+| 9. Quality Verification | 200 | Checklist, four abilities test |
+
+**Total: Deep Mode document should be ≥ 4000 words**
