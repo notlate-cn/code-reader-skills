@@ -272,6 +272,70 @@ Function: DeepModeProgressiveGeneration(code, filePath):
 
 ## Analysis Workflow (Research-Driven)
 
+### 🔄 Sub-Agent Usage Guidelines (Optional Optimization)
+
+**When to Use:**
+- Standard/Deep Mode analyzing complex code
+- Need to process independent tasks in parallel
+- Single chapter content > 1000 words
+
+**Sub-Agent Type Selection:**
+| Agent Type | Use Case | Example |
+|-----------|----------|---------|
+| `Explore` | Multi-round exploration, discover hidden relationships | Quick overview, concept network, dependency exploration |
+| `general-purpose` | Single analysis, need precise output | Algorithm analysis, design patterns, code parsing, quality verification |
+
+**Parallel Processing Strategy:**
+
+```
+Serial dependency chain (must maintain):
+Step1 → Step2 → Step3 → Step6 → Step9
+
+Parallelizable tasks:
+├─ Step4(Algorithms) ∥ Step5(Patterns)
+└─ Step7.1(Scenario1) ∥ Step7.2(Scenario2)
+```
+
+**Hybrid Parallel Flow (Recommended):**
+
+```markdown
+# Standard/Deep Mode Parallel Optimization
+
+1. Serial: Quick Overview → Background & Motivation → Concept Network
+2. Parallel: [Algorithm Analysis, Pattern Analysis]
+3. Serial: Key Code Analysis (depends on previous results)
+4. Parallel: [Transfer Scenario1, Transfer Scenario2]
+5. Serial: Quality Verification
+
+# Pseudocode example
+# Steps 4-5 in parallel
+[AlgoResult, PatternResult] = ParallelRun(
+  Task("Algorithm Analysis", {Concepts}),
+  Task("Pattern Analysis", {Concepts})
+)
+
+# Step 7 scenarios in parallel
+[Scenario1, Scenario2] = ParallelRun(
+  Task("Application Transfer-Scenario1", {Concepts}),
+  Task("Application Transfer-Scenario2", {Concepts})
+)
+```
+
+**When to Use Sub-Agents:**
+| Condition | Use |
+|-----------|-----|
+| Quick Mode | ❌ Serial is fine, less content |
+| Standard Mode + Simple Code | ❌ Serial is fine |
+| Standard Mode + Complex Code | ✅ Moderate parallelism |
+| Deep Mode | ✅ Heavy parallelism + progressive generation |
+
+**Token Considerations:**
+- Sub-agents increase total token consumption (context duplication)
+- Only use when parallel benefit > overhead
+- For Deep Mode progressive generation, consider using separate sub-agent per chapter
+
+---
+
 ### Step 1: Quick Overview
 
 **Goal:** Build overall mental model
