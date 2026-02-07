@@ -1,21 +1,24 @@
 ---
 name: code-reader-v2-en
-description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick (5-10 min), Standard (15-20 min), Deep (30+ min). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code. Trigger words "deeply analyze this code," "help me understand this algorithm," "quickly analyze this code."
+description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 4 analysis modes: Quick (5-10 min), Standard (15-20 min), Deep (30+ min), Parallel Deep (large projects, sub-agent parallel processing). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code. Trigger words "deeply analyze this code," "help me understand this algorithm," "quickly analyze this code," "parallel analyze this project."
 ---
 
-# Source Code Deep Understanding Analyzer v2.0
+# Source Code Deep Understanding Analyzer v2.3
 
-Professional code analysis tool based on cognitive science research, supporting three analysis depths to ensure true understanding rather than fluency illusion.
+Professional code analysis tool based on cognitive science research, supporting four analysis depths to ensure true understanding rather than fluency illusion.
 
-## Three Analysis Modes
+## Four Analysis Modes
 
 | User Intent | Recommended Mode | Trigger Examples | Duration |
 |-------------|-----------------|------------------|----------|
 | Quick browse/code review | Quick Mode | "quickly analyze", "briefly look", "what does this do" | 5-10 min |
 | Learning/technical research | Standard Mode ⭐ | "deeply analyze", "help me understand", "explain principles" | 15-20 min |
 | Interview prep/complete mastery | Deep Mode | "thoroughly analyze", "I need to master this", "interview related" | 30+ min |
+| Large projects/complex codebases | **Parallel Deep Mode** 🚀 | "parallel analyze", "large project analysis", "complete project understanding" | Scales with project size |
 
 **Default: Standard Mode unless user specifies otherwise.**
+
+**🚀 Parallel Deep Mode is designed for large projects, using sub-agents to process chapters in parallel, ensuring sufficient depth for each chapter.**
 
 ---
 
@@ -169,6 +172,224 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Practicality verification
 - Final "four abilities" test
 ```
+
+---
+
+### 🚀 Parallel Deep Mode Output Structure (For Large Projects)
+
+**Designed for large-scale, high-complexity projects. Uses parallel agent architecture to ensure sufficient depth for each chapter.**
+
+#### Core Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Master Coordinator Agent                  │
+│  - Generate analysis outline and directory framework        │
+│  - Identify core concepts list (shared with sub-agents)     │
+│  - Assign chapter tasks                                     │
+│  - Aggregate sub-agent results                              │
+│  - Final quality verification                               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+            ┌─────────────────┼─────────────────┐
+            ▼                 ▼                 ▼
+    ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+    │ Sub-Agent 1 │   │ Sub-Agent 2 │   │ Sub-Agent 3 │
+    │ Background  │   │ Core        │   │ Algorithm   │
+    │ & Motivation│   │ Concepts    │   │ & Theory    │
+    └─────────────┘   └─────────────┘   └─────────────┘
+            │                 │                 │
+            └─────────────────┼─────────────────┘
+                              ▼
+    ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+    │ Sub-Agent 4 │   │ Sub-Agent 5 │   │ Sub-Agent 6 │
+    │ Design      │   │ Code        │   │ Application │
+    │ Patterns    │   │ Analysis    │   │ Transfer    │
+    └─────────────┘   └─────────────┘   └─────────────┘
+```
+
+#### Parallel Execution Flow
+
+| Phase | Executor | Operation | Output |
+|-------|----------|-----------|--------|
+| **1. Framework Prep** | Master Agent | Quick code overview, generate outline and core concepts | `framework.md` |
+| **2. Task Dispatch** | Master Agent | Create independent task descriptions for each chapter | Task list |
+| **3. Parallel Processing** | Sub-Agents | Each sub-agent focuses on one chapter, generates with depth | `chapter-N.md` |
+| **4. Result Aggregation** | Master Agent | Merge all chapters, unify format | `complete-analysis.md` |
+| **5. Quality Verification** | Master Agent | Check depth standards, supplement weak sections | Final document |
+
+#### Chapter Task Definition (Template for Sub-Agents)
+
+```markdown
+# Sub-Agent Task: [Chapter Name]
+
+## Context Information
+- **Code Name:** [Project/Code Name]
+- **Programming Language:** [Language]
+- **Code Scale:** [Line Count]
+- **Core Concepts:** [Concept list passed from master agent]
+
+## Your Task
+You are the analysis expert specializing in "**[Chapter Name]**". Please deeply analyze this chapter and generate detailed content.
+
+## Output Requirements
+1. **Content Depth:** This chapter must be at least [X] words
+2. **WHY Analysis:** Each key point must answer 3 WHYs
+3. **Code Comments:** Use Scenario/Step + WHY style
+4. **Source References:** Provide authoritative reference links
+5. **Independence:** Generate complete independent chapter content, no need to reference other chapters
+
+## Output Format
+Output Markdown format chapter content directly, starting with `## [Chapter Name]`.
+
+## Depth Standards
+- [ ] All subsections covered (no "skipped" or "same as above")
+- [ ] Each WHY has at least 2-3 sentences of explanation
+- [ ] Code examples have complete comments
+- [ ] Execution flows have concrete data tracking
+
+Begin analysis:
+```
+
+#### Master Agent Aggregation Logic
+
+```markdown
+# Parallel Deep Mode Aggregation Specification
+
+## Aggregation Steps
+
+1. **Read All Sub-chapters**
+   ```
+   chapter_1_background.md
+   chapter_2_concepts.md
+   chapter_3_algorithm.md
+   chapter_4_patterns.md
+   chapter_5_code_analysis.md
+   chapter_6_transfer.md
+   chapter_7_dependencies.md
+   chapter_8_verification.md
+   ```
+
+2. **Merge Order**
+   ```markdown
+   # [Code Name] Complete Mastery Analysis (Parallel Deep Edition)
+
+   ## Understanding Verification Status
+   [Generated from master agent's preliminary analysis]
+
+   [Insert each chapter content in order]
+   ```
+
+3. **Cross-Check**
+   - Core concepts have consistent definitions across chapters
+   - WHY explanations have no contradictions
+   - Referenced code examples are consistent
+
+4. **Depth Verification**
+   - Each chapter meets word count requirements
+   - WHY analysis is thorough
+   - Execution examples are complete
+```
+
+#### Implementation Pseudocode
+
+```
+Function: ParallelDeepMode(code, workDirectory):
+
+  // ========== Phase 1: Framework Preparation ==========
+  framework = {
+    "code_name": ExtractName(code),
+    "language": IdentifyLanguage(code),
+    "code_scale": CountLines(code),
+    "core_concepts": ExtractCoreConcepts(code),  // Shared with all sub-agents
+    "chapter_list": [
+      "Background & Motivation",
+      "Core Concepts",
+      "Algorithm & Theory",
+      "Design Patterns",
+      "Key Code Analysis",
+      "Application Transfer Scenarios",
+      "Dependencies",
+      "Quality Verification"
+    ]
+  }
+
+  WriteFile(f"{workDirectory}/00-framework.json", framework)
+
+  // ========== Phase 2: Create Sub-Tasks ==========
+  subTaskList = []
+
+  for each chapter in framework["chapter_list"]:
+    taskDescription = GenerateTaskTemplate(chapter, framework)
+    taskFile = f"{workDirectory}/tasks/{chapter}-task.md"
+    WriteFile(taskFile, taskDescription)
+    subTaskList.append(taskFile)
+
+  // ========== Phase 3: Execute Sub-Agents in Parallel ==========
+  // Note: Actual execution via Task tool creating parallel sub-agents
+
+  chapterFileList = []
+
+  for each taskFile in subTaskList:
+    // Create sub-agent (parallel execution)
+    subAgent = CreateAgent(
+      name: f"Analyze-{chapter}",
+      task: ReadFile(taskFile),
+      code: code,
+      outputFile: f"{workDirectory}/chapters/{chapter}.md"
+    )
+
+    // Start parallel execution
+    subAgent.start(parallel=True)
+    chapterFileList.append(subAgent.outputFile)
+
+  // Wait for all sub-agents to complete
+  WaitAll(chapterFileList)
+
+  // ========== Phase 4: Result Aggregation ==========
+  completeDoc = "# {framework['code_name']} Complete Mastery Analysis\n\n"
+  completeDoc += "## Understanding Verification Status\n\n"
+  completeDoc += GenerateVerificationTable(framework) + "\n\n"
+
+  for each chapterFile in chapterFileList:
+    chapterContent = ReadFile(chapterFile)
+    completeDoc += chapterContent + "\n\n"
+
+  // ========== Phase 5: Quality Verification ==========
+  if not PassDepthCheck(completeDoc):
+    weakChapters = IdentifyWeakParts(completeDoc)
+    for each chapter in weakChapters:
+      // Re-execute that chapter's sub-agent, requiring deeper content
+      ReExecute(chapter)
+      completeDoc = UpdateChapter(completeDoc, chapter)
+
+  // ========== Final Output ==========
+  finalFile = f"{workDirectory}/{framework['code_name']}-complete-mastery-analysis.md"
+  WriteFile(finalFile, completeDoc)
+
+  return finalFile
+```
+
+#### Trigger Word Detection
+
+Auto-select Parallel Deep Mode when user uses:
+
+- "Parallel analyze this project"
+- "Complete project understanding"
+- "Large codebase analysis"
+- "Deep analyze entire project"
+- "Project scale over 5000 lines"
+- Or when detected code scale > 5000 lines, suggest Parallel Mode
+
+#### Advantages of Parallel Strategy
+
+| Comparison | Traditional Deep Mode | Parallel Deep Mode |
+|------------|----------------------|--------------------|
+| Execution | Sequential chapter generation | Parallel chapter generation |
+| Per-Chapter Depth | Limited by context, may be brief | Independent context, fully expanded |
+| Total Time | Longer | Shorter (parallel acceleration) |
+| Quality Assurance | Relies on single output depth | Independent quality check per chapter |
+| Use Case | Medium-small code | Large projects, complex codebases |
 
 **Progressive Generation Flow (Deep Mode Exclusive):**
 
@@ -1148,6 +1369,15 @@ Before starting analysis, confirm:
 
 **After analysis completion, you MUST generate a standalone Markdown document!**
 
+### Four Mode Document Generation Strategies
+
+| Mode | Generation Method | File Count | Typical Use Case |
+|------|------------------|------------|------------------|
+| **Quick** | Single Write | 1 | Quick code review |
+| **Standard** | Single Write | 1 | Learning to understand code |
+| **Deep** | Progressive Write | 1-2 | Interview prep, complete mastery |
+| **Parallel Deep** | Multi-agent parallel + aggregate | Multiple chapters → 1 final doc | Large projects, complex codebases |
+
 ### ⚡ Token-Saving Strategies
 
 **Core Principle: Avoid duplicate output, write directly to file**
@@ -1215,6 +1445,37 @@ Before starting analysis, confirm:
    See "Deep Mode Output Structure - Progressive Generation Flow" section above for details
    ```
 
+   **Method 4: Parallel generation (Parallel Deep Mode only) 🚀**
+   ```
+   For: Large projects (code volume > 5000 lines), complex codebases
+
+   Flow:
+   1. Master agent generates framework and task assignments
+   2. Use Task tool to create multiple parallel sub-agents
+   3. Each sub-agent focuses on one chapter, generates independent file
+   4. Master agent aggregates all chapters, generates final document
+
+   File structure:
+   work/
+   ├── 00-framework.json       # Framework generated by master agent
+   ├── tasks/                  # Sub-task description directory
+   │   ├── background-task.md
+   │   ├── concepts-task.md
+   │   └── ...
+   ├── chapters/               # Chapters generated by sub-agents
+   │   ├── background-chapter.md
+   │   ├── concepts-chapter.md
+   │   └── ...
+   └── [project-name]-complete-mastery-analysis.md  # Final aggregated document
+
+   Example Task call:
+   Task(
+     description: "Analyze Background & Motivation chapter",
+     prompt: "You are a background & motivation analysis expert. Please deeply analyze the following code's background and motivation...[specific instructions]",
+     subagent_type: "general-purpose"
+   )
+   ```
+
 3. **Conversation Output Format (Brief)**
 
    ```markdown
@@ -1249,14 +1510,92 @@ Before starting analysis, confirm:
 
 ### Large Project Chunking Guide
 
-| Project Scale | Generation Strategy | File Structure |
-|--------------|---------------------|----------------|
-| < 500 lines | Single document | `[name]-analysis.md` |
-| 500-2000 lines | Single document (may be long) | `[name]-analysis.md` |
-| 2000-10000 lines | By module | `[project]-overview.md` + `[module]-analysis.md` (3-5 files) |
-| > 10000 lines | Layered + by module | `[project]-architecture.md` + `[project]-overview.md` + `[module]-analysis.md` (multiple) |
+| Project Scale | Recommended Mode | Generation Strategy | File Structure |
+|--------------|-----------------|---------------------|----------------|
+| < 500 lines | Quick/Standard | Single document | `[name]-analysis.md` |
+| 500-2000 lines | Standard | Single document (may be long) | `[name]-analysis.md` |
+| 2000-10000 lines | Deep | By module | `[project]-overview.md` + `[module]-analysis.md` (3-5 files) |
+| > 10000 lines | **Parallel Deep** 🚀 | Parallel chapters | Multiple temp chapters → 1 final doc |
+| > 50000 lines | **Parallel Deep** 🚀 | Layered parallel | Module-level parallel + chapter-level parallel |
 
 **Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
+
+---
+
+### 🚀 Parallel Deep Mode Implementation Guide (Specific Instructions for Claude)
+
+When user requires Parallel Deep Mode, execute following steps:
+
+#### Step 1: Identify Mode
+```
+Trigger conditions (any match):
+- User explicitly says "parallel analyze", "complete project understanding"
+- More than 10 code files
+- Total code lines > 5000
+- User says "this is a large project"
+```
+
+#### Step 2: Preparation Phase
+```bash
+# Create working directory
+mkdir -p code-analysis/{tasks,chapters}
+
+# Generate framework file
+cat > code-analysis/00-framework.json << 'EOF'
+{
+  "project_name": "[Project Name]",
+  "language": "[Language]",
+  "total_lines": [Line Count],
+  "core_concepts": [Concept List],
+  "chapters": [
+    "Background & Motivation", "Core Concepts", "Algorithm & Theory",
+    "Design Patterns", "Code Analysis", "Application Transfer",
+    "Dependencies", "Quality Verification"
+  ]
+}
+EOF
+```
+
+#### Step 3: Create Parallel Sub-Agents
+```
+For each chapter, use Task tool to create independent sub-agent:
+
+Task(
+  description: "Deep analyze [Chapter Name] chapter",
+  prompt: """
+  You are a [Chapter Name] analysis expert.
+
+  ## Context
+  - Project: {project_name}
+  - Language: {language}
+  - Core concepts: {core_concepts}
+
+  ## Task
+  Deeply analyze the [Chapter Name] part of the code, generate detailed chapter content (at least {min_words} words).
+
+  ## Requirements
+  - Use Scenario/Step + WHY style comments
+  - Answer 3 WHYs for each key point
+  - Provide concrete execution examples
+  - Cite authoritative sources
+
+  ## Output
+  Write complete chapter content to file:
+  code-analysis/chapters/{chapter_name}.md
+  """,
+  subagent_type: "general-purpose"
+)
+```
+
+#### Step 4: Aggregate Results
+```
+After all sub-agents complete, use Read tool to read all chapter files, merge in order:
+
+1. Read code-analysis/00-framework.json
+2. Read code-analysis/chapters/*.md (in order)
+3. Merge into final document
+4. Write to {project_name}-complete-mastery-analysis.md
+```
 
 ---
 
