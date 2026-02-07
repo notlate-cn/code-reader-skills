@@ -5,7 +5,7 @@
 **基于认知科学的源代码深度理解工具 | Cognitive Science-Based Code Analysis Tool**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.2.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
+[![Version](https://img.shields.io/badge/version-2.3.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
 [![Claude Skills](https://img.shields.io/badge/Claude-Skills-orange.svg)](https://claude.ai)
 [![Language](https://img.shields.io/badge/language-中文%20%7C%20English-red.svg)](#)
 
@@ -30,7 +30,8 @@
 - 🔗 **概念网络构建** - 建立知识连接，而非孤立记忆
 - 🚀 **应用迁移测试** - 检验能否在不同场景应用
 - 📚 **学术研究支撑** - 基于 Dunlosky, Chi, Karpicke 等认知科学研究
-- ⚡ **三种模式** - Quick/Standard/Deep 满足不同需求
+- ⚡ **四种模式** - Quick/Standard/Deep/Parallel Deep 满足不同需求
+- 🤖 **并行分析** - 子 Agent 并行处理，确保大型项目分析深度
 
 ### 📦 文件结构
 
@@ -58,17 +59,20 @@ git clone https://github.com/notlate-cn/code-reader-skills.git
 cd code-reader-skills
 ```
 
-#### 2. 三种分析模式
+#### 2. 四种分析模式
 
-支持三种分析深度，根据场景自动选择：
+支持四种分析深度，根据场景自动选择：
 
 | 模式 | 耗时 | 适用场景 | 触发词示例 |
 |------|------|---------|-----------|
 | **Quick** | 5-10 分钟 | 快速浏览、代码审查 | "快速分析"、"简单看看" |
 | **Standard** | 15-20 分钟 | 学习理解、技术调研 ⭐ | "深入分析"、"帮我理解" |
 | **Deep** | 30+ 分钟 | 面试准备、完全掌握 | "彻底分析"、"我要掌握" |
+| **Parallel Deep** 🚀 | 按项目规模 | 大型项目、复杂代码库 | "并行分析"、"完整项目理解" |
 
 **默认使用 Standard Mode**
+
+**Parallel Deep Mode 专为大型项目（>5000 行）设计，使用子 Agent 并行处理各章节，确保每个章节都有足够深度。**
 
 #### 3. 安装 Skill
 
@@ -133,6 +137,12 @@ message = client.messages.create(
 [上传或粘贴代码]
 ```
 
+**Parallel Deep Mode 触发示例：**
+```
+你：/code-reader-v2-cn 并行分析这个大型项目
+[上传或粘贴代码，或提供项目路径]
+```
+
 ### 📊 输出结构
 
 #### Quick Mode（快速概览）
@@ -161,6 +171,14 @@ message = client.messages.create(
 - ✅ 质量验证清单
 - 📝 渐进式生成（确保深度）
 - 💾 直接写入文件（Token 优化）
+
+#### Parallel Deep Mode（大型项目专用）🚀
+[包含 Deep Mode 所有内容，采用并行架构]
+- 🤖 主协调 Agent：框架生成、任务分发、结果汇总
+- ⚡ 并行子 Agents：8 个章节同时处理
+- 📊 独立上下文：每个章节都有充分深度
+- 🔄 自动汇总：生成最终完整文档
+- 📁 文件结构：`00-框架.json` + `tasks/` + `chapters/` → `最终文档.md`
 
 ### 💡 使用示例
 
@@ -244,6 +262,23 @@ def authenticate_user(username, password):
 
 ### 📝 更新日志
 
+#### v2.3.0 (2026-02-07)
+
+**新增功能：**
+- 🚀 Parallel Deep Mode（并行深度模式）- 专为大型项目设计
+- 🤖 子 Agent 并行架构 - 确保每个章节都有足够深度
+- 📊 主协调 Agent - 框架生成、任务分发、结果汇总
+- 🔄 完整实现指南 - Task tool 调用示例
+
+**改进：**
+- 📖 更新为四种分析模式
+- 🎯 大型项目（>5000 行）自动建议并行模式
+- 📝 新增 CLAUDE.md 仓库指南
+
+**解决问题：**
+- ✅ 解决大型项目分析时章节内容过浅的问题
+- ✅ 并行处理提高效率，同时确保深度
+
 #### v2.2.0 (2026-02-04)
 
 **新增功能：**
@@ -307,7 +342,8 @@ A professional Claude Skills set that helps developers **truly understand** sour
 - 🚀 **Application Transfer Test** - Examine if applicable in different scenarios
 - 📚 **Academic Research Support** - Based on Dunlosky, Chi, Karpicke's cognitive science research
 - 🌐 **Bilingual Support** - Complete Chinese and English versions
-- ⚡ **Three Modes** - Quick/Standard/Deep for different needs
+- ⚡ **Four Modes** - Quick/Standard/Deep/Parallel Deep for different needs
+- 🤖 **Parallel Analysis** - Sub-agents process chapters in parallel, ensuring depth for large projects
 
 ### 📦 File Structure
 
@@ -335,15 +371,18 @@ git clone https://github.com/notlate-cn/code-reader-skills.git
 cd code-reader-skills
 ```
 
-#### 2. Three Analysis Modes
+#### 2. Four Analysis Modes
 
 | Mode | Duration | Use Case | Trigger Examples |
 |------|----------|----------|------------------|
 | **Quick** | 5-10 min | Quick browse, code review | "quickly analyze", "briefly look" |
 | **Standard** | 15-20 min | Learning, research ⭐ | "deeply analyze", "help me understand" |
 | **Deep** | 30+ min | Interview prep, mastery | "thoroughly analyze", "I need to master this" |
+| **Parallel Deep** 🚀 | Scales with project | Large projects, complex codebases | "parallel analyze", "complete project understanding" |
 
 **Default: Standard Mode**
+
+**Parallel Deep Mode is designed for large projects (>5000 lines), using sub-agents to process chapters in parallel, ensuring sufficient depth for each chapter.**
 
 #### 3. Install Skill
 
@@ -408,6 +447,12 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 [Upload or paste code]
 ```
 
+**Parallel Deep Mode Trigger Example:**
+```
+You: /code-reader-v2-en Parallel analyze this large project
+[Upload or paste code, or provide project path]
+```
+
 ### 📊 Output Structure
 
 #### Quick Mode
@@ -437,6 +482,14 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 - Progressive Generation (Ensure depth)
 - Direct File Writing (Token optimized)
 
+#### Parallel Deep Mode 🚀 (For Large Projects)
+[All Deep Mode content, with parallel architecture]
+- Master Coordinator Agent: Framework generation, task dispatch, result aggregation
+- Parallel Sub-Agents: 8 chapters processed simultaneously
+- Independent Context: Each chapter has sufficient depth
+- Auto-Aggregation: Generate final complete document
+- File Structure: `00-framework.json` + `tasks/` + `chapters/` → `final-document.md`
+
 ### 🔬 Research Foundation
 
 Based on the following cognitive science research:
@@ -457,12 +510,13 @@ Contributions are welcome! Here's how to participate:
 ### ❓ FAQ
 
 <details>
-<summary><strong>Q: What's the difference between three modes?</strong></summary>
+<summary><strong>Q: What's the difference between four modes?</strong></summary>
 
 **A:**
 - **Quick**: Fast understanding of structure and functionality, 5-10 min
 - **Standard**: Understand WHY and design rationale, 15-20 min (Recommended)
 - **Deep**: Application transfer testing + quality verification, 30+ min
+- **Parallel Deep**: For large projects (>5000 lines), parallel chapter processing with guaranteed depth
 </details>
 
 <details>
@@ -484,6 +538,23 @@ Contributions are welcome! Here's how to participate:
 </details>
 
 ### 📝 Changelog
+
+#### v2.3.0 (2026-02-07)
+
+**New Features:**
+- 🚀 Parallel Deep Mode - Designed for large projects
+- 🤖 Sub-Agent parallel architecture - Ensures sufficient depth for each chapter
+- 📊 Master coordinator agent - Framework generation, task dispatch, result aggregation
+- 🔄 Complete implementation guide - Task tool usage examples
+
+**Improvements:**
+- 📖 Updated to four analysis modes
+- 🎯 Auto-suggest parallel mode for large projects (>5000 lines)
+- 📝 Added CLAUDE.md repository guide
+
+**Problems Solved:**
+- ✅ Fixed shallow chapter content issue in large project analysis
+- ✅ Parallel processing improves efficiency while ensuring depth
 
 #### v2.2.0 (2026-02-04)
 
