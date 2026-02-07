@@ -1,24 +1,25 @@
 ---
 name: code-reader-v2-en
-description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 4 analysis modes: Quick (5-10 min), Standard (15-20 min), Deep (30+ min), Parallel Deep (large projects, sub-agent parallel processing). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code. Trigger words "deeply analyze this code," "help me understand this algorithm," "quickly analyze this code," "parallel analyze this project."
+description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick, Standard, Deep (auto-parallel for large projects). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code.
 ---
 
 # Source Code Deep Understanding Analyzer v2.3
 
-Professional code analysis tool based on cognitive science research, supporting four analysis depths to ensure true understanding rather than fluency illusion.
+Professional code analysis tool based on cognitive science research, supporting three analysis depths to ensure true understanding rather than fluency illusion.
 
-## Four Analysis Modes
+## Three Analysis Modes
 
 | User Intent | Recommended Mode | Trigger Examples | Duration |
 |-------------|-----------------|------------------|----------|
-| Quick browse/code review | Quick Mode | "quickly analyze", "briefly look", "what does this do" | 5-10 min |
-| Learning/technical research | Standard Mode ⭐ | "deeply analyze", "help me understand", "explain principles" | 15-20 min |
-| Interview prep/complete mastery | Deep Mode | "thoroughly analyze", "I need to master this", "interview related" | 30+ min |
-| Large projects/complex codebases | **Parallel Deep Mode** 🚀 | "parallel analyze", "large project analysis", "complete project understanding" | Scales with project size |
+| Quick browse/code review | Quick Mode | "quick look", "what does this do", "briefly scan" | 5-10 min |
+| Learning/technical research | Standard Mode ⭐ | "analyze", "help me understand", "explain" | 15-20 min |
+| Deep mastery/large projects | Deep Mode 🚀 | "thoroughly analyze", "completely master", "in-depth research", "interview prep", "project analysis" | 30+ min |
 
-**Default: Standard Mode unless user specifies otherwise.**
+**Default: Standard Mode, system auto-selects optimal mode based on code scale and user intent.**
 
-**🚀 Parallel Deep Mode is designed for large projects, using sub-agents to process chapters in parallel, ensuring sufficient depth for each chapter.**
+**🚀 Deep Mode internal smart strategy:**
+- Code ≤ 2000 lines: Progressive generation (sequential chapter filling)
+- Code > 2000 lines: Auto-enable parallel processing (sub-agents analyze chapters in parallel)
 
 ---
 
@@ -142,9 +143,13 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Detailed WHY comments
 ```
 
-### Deep Mode Output Structure (30+ min) - Progressive Generation
+### Deep Mode Output Structure (30+ min)
 
-**Use progressive generation strategy to ensure every chapter has sufficient depth:**
+**Deep Mode auto-selects optimal strategy based on code scale, ensuring sufficient depth for each chapter:**
+
+#### Strategy A: Progressive Generation (Code ≤ 2000 lines)
+
+**For medium-small code, generate chapters sequentially:**
 
 ```markdown
 # [Code Name] Complete Mastery Analysis
@@ -173,11 +178,9 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Final "four abilities" test
 ```
 
----
+#### Strategy B: Parallel Processing (Code > 2000 lines) 🚀
 
-### 🚀 Parallel Deep Mode Output Structure (For Large Projects)
-
-**Designed for large-scale, high-complexity projects. Uses parallel agent architecture to ensure sufficient depth for each chapter.**
+**For large projects, using sub-agent parallel architecture:**
 
 #### Core Architecture
 
@@ -368,105 +371,6 @@ Function: ParallelDeepMode(code, workDirectory):
   WriteFile(finalFile, completeDoc)
 
   return finalFile
-```
-
-#### Trigger Word Detection
-
-Auto-select Parallel Deep Mode when user uses:
-
-- "Parallel analyze this project"
-- "Complete project understanding"
-- "Large codebase analysis"
-- "Deep analyze entire project"
-- "Project scale over 5000 lines"
-- Or when detected code scale > 5000 lines, suggest Parallel Mode
-
-#### Advantages of Parallel Strategy
-
-| Comparison | Traditional Deep Mode | Parallel Deep Mode |
-|------------|----------------------|--------------------|
-| Execution | Sequential chapter generation | Parallel chapter generation |
-| Per-Chapter Depth | Limited by context, may be brief | Independent context, fully expanded |
-| Total Time | Longer | Shorter (parallel acceleration) |
-| Quality Assurance | Relies on single output depth | Independent quality check per chapter |
-| Use Case | Medium-small code | Large projects, complex codebases |
-
-**Progressive Generation Flow (Deep Mode Exclusive):**
-
-| Phase | Operation | Depth Assurance Mechanism |
-|-------|-----------|--------------------------|
-| **1. Framework** | Generate full TOC + chapter placeholders | Plan structure upfront, avoid omissions |
-| **2. Fill Chapters** | Process each chapter sequentially | Focus on one chapter at a time, fully develop |
-| **3. Depth Check** | Self-check after each chapter | Verify Deep Mode standards met |
-| **4. Reinforce** | Append content to weak chapters | Targeted supplementation of insufficient parts |
-
-**Depth Standards for Each Chapter:**
-
-```markdown
-## Depth Self-Check Checklist (After Each Chapter)
-
-### Content Completeness
-- [ ] All chapter subsections covered (no "skipped" or "same as above")
-- [ ] Every WHY has specific explanation (not just one sentence)
-- [ ] Code examples have complete comments (Scenario/Step + WHY)
-
-### Analysis Depth
-- [ ] Core concepts have 3 WHYs fully answered
-- [ ] Algorithms have complexity analysis + rationale
-- [ ] Design patterns have WHY used + what happens without
-- [ ] Execution flows have concrete data tracking
-
-### Practicality
-- [ ] Error-prone points marked
-- [ ] Boundary conditions explained
-- [ ] At least 2 application transfer scenarios
-```
-
-**Implementation (Pseudocode Flow):**
-
-```
-Function: DeepModeProgressiveGeneration(code, filePath):
-
-  // Phase 1: Generate framework
-  framework = GenerateFullTOC(StandardStructure + DeepExtensions)
-  WriteFile(filePath, framework)
-
-  // Phase 2: Fill chapter by chapter
-  chapters = [
-    "1. Quick Overview",
-    "2. Background & Motivation",
-    "3. Core Concepts",
-    "4. Algorithm & Theory",
-    "5. Design Patterns",
-    "6. Key Code Deep Analysis",
-    "7. Application Transfer",
-    "8. Dependencies",
-    "9. Quality Verification"
-  ]
-
-  for each chapter in chapters:
-    currentContent = ReadFile(filePath)
-
-    // Generate chapter content (single focus, ensure depth)
-    chapterContent = DeepGenerateChapter(chapter, code)
-    // Requirement: Each chapter ≥ 300-500 words, code has full comments
-
-    // Depth self-check
-    if not PassDepthCheck(chapterContent):
-      chapterContent = AppendDetails(chapterContent)
-
-    // Update file
-    newContent = currentContent.replace(chapterPlaceholder, chapterContent)
-    WriteFile(filePath, newContent)
-
-  // Phase 3: Overall validation
-  fullDoc = ReadFile(filePath)
-  if not PassOverallCheck(fullDoc):
-    weakChapters = IdentifyWeakParts(fullDoc)
-    for chapter in weakChapters:
-      SupplementContent(chapter)
-
-  return filePath
 ```
 
 ---
@@ -1369,14 +1273,15 @@ Before starting analysis, confirm:
 
 **After analysis completion, you MUST generate a standalone Markdown document!**
 
-### Four Mode Document Generation Strategies
+### Three Mode Document Generation Strategies
 
 | Mode | Generation Method | File Count | Typical Use Case |
 |------|------------------|------------|------------------|
 | **Quick** | Single Write | 1 | Quick code review |
 | **Standard** | Single Write | 1 | Learning to understand code |
-| **Deep** | Progressive Write | 1-2 | Interview prep, complete mastery |
-| **Parallel Deep** | Multi-agent parallel + aggregate | Multiple chapters → 1 final doc | Large projects, complex codebases |
+| **Deep** | Auto-select strategy based on scale | 1-2 | Interview prep, complete mastery |
+| → Code ≤ 2000 lines | Progressive Write | 1-2 | Medium-small code |
+| → Code > 2000 lines | Multi-agent parallel + aggregate | Multiple chapters → 1 final doc | Large projects, complex codebases |
 
 ### ⚡ Token-Saving Strategies
 
@@ -1438,17 +1343,16 @@ Before starting analysis, confirm:
       - List all file paths
    ```
 
-   **Method 3: Progressive generation (Deep Mode only)**
+   **Method 3: Deep Mode (auto-select based on code scale)**
    ```
-   For: Complex code with analysis expected over 5000 words
+   Deep Mode will auto-select optimal generation strategy:
 
-   See "Deep Mode Output Structure - Progressive Generation Flow" section above for details
-   ```
+   【Strategy A: Progressive Generation】When code ≤ 2000 lines
+   - First generate framework document (TOC + summary)
+   - Fill sections incrementally, update file with each Write call
+   - See "Deep Mode Output Structure - Strategy A" section above
 
-   **Method 4: Parallel generation (Parallel Deep Mode only) 🚀**
-   ```
-   For: Large projects (code volume > 5000 lines), complex codebases
-
+   【Strategy B: Parallel Processing】When code > 2000 lines
    Flow:
    1. Master agent generates framework and task assignments
    2. Use Task tool to create multiple parallel sub-agents
@@ -1514,28 +1418,35 @@ Before starting analysis, confirm:
 |--------------|-----------------|---------------------|----------------|
 | < 500 lines | Quick/Standard | Single document | `[name]-analysis.md` |
 | 500-2000 lines | Standard | Single document (may be long) | `[name]-analysis.md` |
-| 2000-10000 lines | Deep | By module | `[project]-overview.md` + `[module]-analysis.md` (3-5 files) |
-| > 10000 lines | **Parallel Deep** 🚀 | Parallel chapters | Multiple temp chapters → 1 final doc |
-| > 50000 lines | **Parallel Deep** 🚀 | Layered parallel | Module-level parallel + chapter-level parallel |
+| 2000-10000 lines | Deep (auto parallel) | Parallel chapters | Multiple temp chapters → 1 final doc |
+| > 10000 lines | Deep (auto parallel) | Layered parallel | Module-level parallel + chapter-level parallel |
 
 **Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
 
 ---
 
-### 🚀 Parallel Deep Mode Implementation Guide (Specific Instructions for Claude)
+### 🚀 Deep Mode Auto Implementation Guide (Specific Instructions for Claude)
 
-When user requires Parallel Deep Mode, execute following steps:
+Deep Mode will auto-select optimal strategy. When parallel processing is needed:
 
-#### Step 1: Identify Mode
+#### Step 1: Identify if parallel processing is needed
 ```
-Trigger conditions (any match):
-- User explicitly says "parallel analyze", "complete project understanding"
-- More than 10 code files
-- Total code lines > 5000
-- User says "this is a large project"
+Auto-trigger conditions (any match):
+- Code files > 10
+- Total code lines > 2000
+- User explicitly says "large project", "complete project", "project analysis"
+- User uses depth triggers like "thoroughly", "completely master", "in-depth research" with large code scale
 ```
 
-#### Step 2: Preparation Phase
+#### Step 2: Select processing strategy
+```
+if code_lines <= 2000:
+    Use Strategy A: Progressive Generation (sequential processing)
+else:
+    Use Strategy B: Parallel Processing (detailed below)
+```
+
+#### Step 3: Parallel processing preparation (Strategy B)
 ```bash
 # Create working directory
 mkdir -p code-analysis/{tasks,chapters}
@@ -1556,7 +1467,7 @@ cat > code-analysis/00-framework.json << 'EOF'
 EOF
 ```
 
-#### Step 3: Create Parallel Sub-Agents
+#### Step 4: Create parallel sub-agents
 ```
 For each chapter, use Task tool to create independent sub-agent:
 
@@ -1587,7 +1498,7 @@ Task(
 )
 ```
 
-#### Step 4: Aggregate Results
+#### Step 5: Aggregate results
 ```
 After all sub-agents complete, use Read tool to read all chapter files, merge in order:
 
