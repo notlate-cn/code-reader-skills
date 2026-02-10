@@ -166,6 +166,7 @@ message = client.messages.create(
 [包含 Standard Mode 所有内容，加上]
 - 🔗 概念网络图
 - 📊 完整执行示例（多场景追踪）
+- 🧪 **测试用例分析**（如有测试，通过测试反向理解代码）
 - 🚀 应用迁移场景（至少 2 个）
 - ✅ 质量验证清单
 - 🤖 **智能策略选择**：代码 ≤ 2000 行使用渐进式生成，代码 > 2000 行自动启用并行处理
@@ -261,14 +262,18 @@ def authenticate_user(username, password):
 - ⚡ 优化触发词系统，丰富各模式触发词
 - 🤖 Deep Mode 内部智能选择：≤2000 行渐进式，>2000 行自动并行
 - 📖 简化为三种模式：Quick/Standard/Deep
+- 🧪 新增测试用例反向理解功能（Step 6.5）
 
 **改进：**
 - 🎯 用户体验更友好，无需手动选择并行模式
 - 📝 更新中英文 SKILL.md 和 README 文档
+- 🔬 支持通过测试用例反向验证和深化理解
+- 🛠️ 支持 C++、MLIR/LLVM 等多种语言测试格式
 
 **解决问题：**
 - ✅ 解决模式过于冗余的问题
 - ✅ 自动策略选择降低使用门槛
+- ✅ 通过测试发现代码中隐藏的行为和边界条件
 
 #### v2.2.0 (2026-02-04)
 
@@ -439,8 +444,8 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 
 **Parallel Deep Mode Trigger Example:**
 ```
-You: /code-reader-v2-en Parallel analyze this large project
-[Upload or paste code, or provide project path]
+You: /code-reader-v2-en Thoroughly analyze this large project
+[Upload or paste code, system will auto-use parallel processing when >2000 lines detected]
 ```
 
 ### 📊 Output Structure
@@ -467,6 +472,7 @@ You: /code-reader-v2-en Parallel analyze this large project
 [All Standard Mode content, plus]
 - Concept Network Diagram
 - Complete Execution Examples (Multi-scenario tracking)
+- **Test Case Analysis** (if tests exist, reverse-understand code through tests)
 - Application Transfer Scenarios (at least 2)
 - Quality Verification Checklist
 - **Smart Strategy Selection**: Code ≤ 2000 lines uses progressive, code > 2000 lines auto-enables parallel processing
@@ -528,14 +534,18 @@ Contributions are welcome! Here's how to participate:
 - ⚡ Optimize trigger word system, enrich trigger words for each mode
 - 🤖 Deep Mode smart selection: ≤2000 lines progressive, >2000 lines auto-parallel
 - 📖 Simplify to 3 modes: Quick/Standard/Deep
+- 🧪 Add test case reverse understanding feature (Step 6.5)
 
 **Improvements:**
 - 🎯 Better UX, no manual parallel mode selection needed
 - 📝 Updated Chinese/English SKILL.md and README
+- 🔬 Support reverse-understanding code through test cases
+- 🛠️ Support C++, MLIR/LLVM and other language test formats
 
 **Problems Solved:**
 - ✅ Fixed redundant modes issue
 - ✅ Auto strategy selection lowers usage barrier
+- ✅ Discover hidden behaviors and boundary conditions through tests
 
 #### v2.2.0 (2026-02-04)
 
