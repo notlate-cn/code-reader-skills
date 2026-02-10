@@ -139,7 +139,12 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Line-by-line WHY analysis
 - Execution flow examples
 
-## 7. Dependencies & Usage Examples
+## 7. Test Case Analysis (if tests available)
+- Test coverage analysis
+- Boundary conditions from tests
+- Hidden behaviors discovered
+
+## 8. Dependencies & Usage Examples
 - Detailed WHY comments
 ```
 
@@ -166,12 +171,17 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Boundary conditions
 - Error-prone points
 
+## 7. Test Case Analysis (if tests available)
+- Test coverage analysis
+- Key test case interpretations
+- Hidden behaviors discovered from tests
+
 ## 8. Application Transfer Scenarios (at least 2)
 - Scenario 1: Constant principles + modifications + WHY
 - Scenario 2: Constant principles + modifications + WHY
 - Extract universal patterns
 
-## 9. Quality Verification Checklist
+## 10. Quality Verification Checklist
 - Understanding depth verification
 - Technical accuracy verification
 - Practicality verification
@@ -268,9 +278,10 @@ Begin analysis:
    chapter_3_algorithm.md
    chapter_4_patterns.md
    chapter_5_code_analysis.md
-   chapter_6_transfer.md
-   chapter_7_dependencies.md
-   chapter_8_verification.md
+   chapter_6_test_analysis.md
+   chapter_7_transfer.md
+   chapter_8_dependencies.md
+   chapter_9_verification.md
    ```
 
 2. **Merge Order**
@@ -311,6 +322,7 @@ Function: ParallelDeepMode(code, workDirectory):
       "Algorithm & Theory",
       "Design Patterns",
       "Key Code Analysis",
+      "Test Case Analysis",
       "Application Transfer Scenarios",
       "Dependencies",
       "Quality Verification"
@@ -845,7 +857,305 @@ Duration: ~100ms (similar to successful auth)
 
 ---
 
-### Step 7: Application Transfer Test (Verify True Understanding)
+### Step 6.5: Test Case Reverse Understanding (If Tests Available)
+
+**Goal:** Verify and deepen understanding of code functionality through test cases
+
+**Why it's important:**
+- Test cases reflect the **expected behavior** of code, serving as the most accurate "user manual"
+- Tests typically cover **boundary conditions** and **exception scenarios** that are easily overlooked in main code
+- Tests can **verify whether understanding is correct**, avoiding incorrect assumptions
+
+**When test files are detected in code, this step is mandatory.**
+
+#### 6.5.1 Test File Identification
+
+**Common test file patterns:**
+
+| Language | Test File Pattern | Test Directory Structure |
+|----------|-------------------|-------------------------|
+| **Python** | `test_*.py`, `*_test.py` | `tests/`, `test/` |
+| **JavaScript/TypeScript** | `*.test.ts`, `*.test.js` | `__tests__/`, `tests/` |
+| **Go** | `*_test.go` | Same directory as source, `*_test.go` |
+| **Java** | `*Test.java`, `*Tests.java` | `src/test/java/` |
+| **C++** | `*.cpp` (with tests), gtest | `test/`, `tests/`, `unittest/` |
+| **Rust** | `*_test.rs`, `tests/*.rs` | `tests/` |
+| **MLIR/LLVM** | `*.mlir` (test files) | `test/Dialect/*/` |
+
+**Large project test directory structure examples:**
+
+```bash
+# MLIR style (separate test directory)
+mlir/test/Dialect/Linalg/
+├── ops.mlir           # Linalg dialect operation tests
+├── transformation.mlir # Transformation tests
+├── interfaces.mlir    # Interface tests
+└── invalid.mlir       # Error handling tests
+
+# Traditional C++ project style
+project/test/
+├── unittest/          # Unit tests
+├── integration/       # Integration tests
+└── benchmark/         # Performance tests
+```
+
+#### 6.5.2 Test Coverage Analysis
+
+**Analyze functionality points covered by tests:**
+
+```markdown
+## Test Case Coverage Analysis
+
+### Test File Inventory
+| Test File/Directory | Module Tested | Test Case Count |
+|---------------------|--------------|----------------|
+| `test/Dialect/Linalg/ops.mlir` | Linalg Ops | 156 |
+| `test/Dialect/Linalg/invalid.mlir` | Error Handling | 43 |
+| `unittest/test_auth.cpp` | `authenticate_user()` | 12 |
+
+### Functionality Coverage Matrix
+| Core Function | Main Code Location | Test Coverage | Coverage Assessment |
+|--------------|-------------------|--------------|---------------------|
+| linalg.matmul operation | `Dialect/Linalg/Ops/*` | ✅ Has tests | Normal + boundary covered |
+| linalg.generic interface | `Interfaces/*` | ✅ Has tests | Complete coverage |
+| Tile transformation | `Transforms/Tiling.cpp` | ⚠️ Insufficient tests | Missing nested scenarios |
+```
+
+#### 6.5.3 Understanding Boundary Conditions from Tests
+
+**Extract key boundary conditions from tests:**
+
+```markdown
+## Boundary Conditions Discovered from Tests
+
+### MLIR Example: Understanding linalg.generic Region Constraints
+
+#### Test File: test/Dialect/Linalg/invalid.mlir
+```mlir
+// Test: generic's region must have exactly one block
+func.func @invalid_generic_empty_region(%arg0: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {indexing_maps = [affine_map<(d0) -> (d0)>],
+                     iterator_types = ["parallel"]}
+    outs(%arg0) {
+    // Empty region - should error
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY this test is important:**
+- Reveals `linalg.generic`'s **structural constraint**: Must have a block
+- Through **negative testing** (invalid test) clarifies error conditions
+- Boundary condition: region's block count must = 1
+
+#### Test File: test/Dialect/Linalg/ops.mlir
+```mlir
+// Test: Input and output counts must match indexing_maps
+func.func @generic_mismatched_maps(%a: tensor<10xf32>, %b: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {
+    indexing_maps = [
+      affine_map<(d0) -> (d0)>,  // 1 input map
+      affine_map<(d0) -> (d0)>   // 1 output map
+    ],
+    iterator_types = ["parallel"]
+  } ins(%a, %b : tensor<10xf32>, tensor<10xf32>)  // But 2 inputs
+  outs(%0 : tensor<10xf32>) {
+  ^bb0(%in: f32, %in_2: f32, %out: f32):
+    linalg.yield %in : f32
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY handled this way:**
+- Validates **type system constraint**: Input/output count must match maps
+- Tests **static verification** logic, catching errors at compile time
+- Illustrates MLIR's **static strong typing** characteristic
+
+### C++ Example: Understanding Thread Safety through Tests
+
+#### Test File: unittest/concurrent_map_test.cpp
+```cpp
+// Test: Concurrent insert of same key
+TEST(ConcurrentMapTest, ConcurrentInsertSameKey) {
+  ConcurrentMap<int, int> map;
+  const int num_threads = 10;
+  const int key = 42;
+
+  std::vector<std::thread> threads;
+  for (int i = 0; i < num_threads; ++i) {
+    threads.emplace_back([&map, key, i]() {
+      map.Insert(key, i);  // All threads insert same key
+    });
+  }
+
+  for (auto& t : threads) t.join();
+
+  // Verify: Only one insert succeeded
+  EXPECT_EQ(map.Size(), 1);
+  EXPECT_TRUE(map.Contains(key));
+}
+```
+**WHY this test exists:**
+- Verifies **thread safety**: Multi-threaded concurrent access won't crash
+- Illustrates **conflict handling strategy**: Later inserts overwrite earlier (or vice versa)
+- Tests **consistency guarantee**: Final state meets expectations
+```
+
+#### 6.5.4 Test-Driven Understanding Example
+
+**Complete example: Understanding `linalg.tile` transformation through MLIR tests**
+
+```markdown
+## Test Case Reverse Understanding: linalg.tile Transformation
+
+### Question: Can we understand all tile behavior from documentation alone?
+
+**Documentation description (simplified):**
+> `linalg.tile` decomposes linalg operations into smaller fragments
+
+**Potentially missed details:**
+1. How is tile size determined?
+2. Which operations support tile?
+3. What's the loop order after tile?
+4. How are remaining elements handled?
+
+### Answers Discovered from Tests
+
+#### Test 1: test/tile-mlir.mlir - Basic tile behavior
+```mlir
+// Original operation
+%0 = linalg.matmul ins(%A: tensor<128x128xf32>, %B: tensor<128x128xf32>)
+                     outs(%C: tensor<128x128xf32>)
+
+// Tile size 32x32
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**Discovery:** Tile size directly specified, output contains nested loop structure
+
+#### Test 2: test/tile-mlir.mlir - Remaining element handling
+```mlir
+// 127x127 matrix, tile size 32x32
+%0 = linalg.matmul ins(%A: tensor<127x127xf32>, ...)
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**Discovery:** Auto-generates boundary checks for uneven remainders
+
+#### Test 3: test/tile-mlir.mlir - Non-tileable operations
+```mlir
+// Try tiling unsupported operation
+%0 = linalg.generic ...
+%1 = linalg.tile %0 tile_sizes[16]
+// Expected: Compile error or runtime failure
+```
+**Discovery:** Not all operations support tile, has clear limitation conditions
+
+### Understanding Comparison Before vs After Tests
+
+| Question | Documentation Only | After Tests |
+|----------|-------------------|-------------|
+| How to specify tile size? | ⚠️ Unclear | ✅ Direct parameter |
+| How are remainders handled? | ❓ Not mentioned | ✅ Auto boundary check |
+| Which operations supported? | ❓ Incomplete list | ✅ Tests cover all supported ops |
+| What's loop order? | ⚠️ Vague description | ✅ Visible in test IR |
+
+**Conclusion:** Test cases supplement about **50%** of implementation details!
+```
+
+#### 6.5.5 Language-Specific Test File Parsing Points
+
+**Key points for each language's tests:**
+
+```markdown
+## Language-Specific Test File Parsing Points
+
+### Python (pytest/unittest)
+- Look for `test_*.py` or `*_test.py`
+- Note `@pytest.mark.parametrize` parameterized tests
+- Focus on `pytest.raises` exception tests
+- Find fixtures (`conftest.py`) for test context
+
+### C++ (gtest/gtest)
+- Look for `*_test.cpp` or `test/*.cpp`
+- `TEST_F` indicates fixture test with preconditions
+- `EXPECT_*` vs `ASSERT_*`: Whether execution continues on failure
+- `TEST_P` indicates parameterized test
+
+### MLIR/LLVM
+- Test files typically `.mlir` or `.td`
+- `RUN:` command specifies how to execute test
+- `// EXPECTED:` marks expected output
+- `// ERROR:` marks expected compilation errors
+- FileCheck directives: `CHECK-`, `CHECK-NOT:`, `CHECK-DAG:`
+
+### JavaScript/TypeScript (Jest)
+- `*.test.ts`, `*.spec.ts`
+- `describe/it` nested structure
+- `expect(...).toThrow()` exception tests
+- `beforeEach/afterEach` hook functions
+
+### Go
+- Tests co-located with source: `*_test.go`
+- `TestXxx(t *testing.T)` basic tests
+- `TableDrivenTests` table-driven tests
+- `TestMain` test entry point
+
+### Rust
+- `*_test.rs` inline tests
+- `tests/` directory integration tests
+- `#[should_panic]` exception tests
+- `#[ignore]` skipped tests
+```
+
+#### 6.5.6 Test Quality Assessment
+
+**Assess whether tests are adequate:**
+
+```markdown
+## Test Quality Assessment
+
+### Covered Functionality Points
+- ✅ Normal flow
+- ✅ Boundary inputs
+- ✅ Exception inputs
+- ⚠️ Concurrent scenarios
+- ❌ Performance tests
+
+### MLIR-Specific Assessment
+- ✅ Positive tests (valid.mlir)
+- ✅ Negative tests (invalid.mlir)
+- ⚠️ Performance regression tests
+- ❌ Cross-dialect interaction tests
+
+### Test Coverage Warning
+> ⚠️ **Warning: Module has insufficient test coverage**
+> - Uncovered scenarios: [List specific items]
+> - Suggested additions: [Specific recommendations]
+```
+
+#### 6.5.7 Test Case Analysis Output Template
+
+```markdown
+## Test Case Analysis
+
+### Test File Structure
+[List test files/directories and their corresponding source modules]
+
+### Key Test Case Interpretations
+[Select 3-5 most valuable test cases]
+
+### Hidden Behaviors Discovered from Tests
+[List details easily missed when reading code only]
+
+### Test Coverage Assessment
+- Core functionality coverage: X%
+- Boundary condition coverage: [Adequate/Insufficient]
+
+### Test Quality Recommendations
+[If tests inadequate, provide improvement suggestions]
+```
+
+---
+
+### Step 9: Application Transfer Test (Verify True Understanding)
 
 **Goal:** Test if concepts can apply to different scenarios
 
@@ -972,7 +1282,7 @@ def quicksort_logs(log_file, output_file, memory_limit):
 
 ---
 
-### Step 8: Dependencies & Usage Examples
+### Step 10: Dependencies & Usage Examples
 
 (Similar to original but with WHY explanations)
 
@@ -1076,7 +1386,7 @@ Time: ~100ms (similar to success, prevent timing attack)
 
 ---
 
-### Step 9: Self-Assessment Checklist
+### Step 11: Self-Assessment Checklist
 
 **After analysis completion, mandatory verification of following items:**
 
@@ -1187,14 +1497,17 @@ If any answer is "no," the analysis is insufficient and needs supplementation.
 ## 6. Key Code Deep Analysis
 - Each segment: Line-by-line analysis (what + WHY) + Execution examples + Key takeaways
 
-## 7. Application Transfer Scenarios (at least 2)
+## 7. Test Case Analysis (if tests available)
+- Test file structure + Key test interpretations + Hidden behaviors discovered
+
+## 8. Application Transfer Scenarios (at least 2)
 - Each scenario: Unchanged principles + Parts needing modification + WHY transfer this way
 
-## 8. Dependencies & Usage Examples
+## 9. Dependencies & Usage Examples
 - Each dependency: WHY chosen + WHY not others
 - Examples contain detailed WHY comments
 
-## 9. Quality Verification Checklist
+## 10. Quality Verification Checklist
 [Check all verification items]
 ```
 
@@ -1460,8 +1773,8 @@ cat > code-analysis/00-framework.json << 'EOF'
   "core_concepts": [Concept List],
   "chapters": [
     "Background & Motivation", "Core Concepts", "Algorithm & Theory",
-    "Design Patterns", "Code Analysis", "Application Transfer",
-    "Dependencies", "Quality Verification"
+    "Design Patterns", "Code Analysis", "Test Case Analysis",
+    "Application Transfer", "Dependencies", "Quality Verification"
   ]
 }
 EOF
@@ -1585,8 +1898,9 @@ After all sub-agents complete, use Read tool to read all chapter files, merge in
 | 4. Algorithm & Theory | 500 | Complexity, WHY, references |
 | 5. Design Patterns | 400 | Pattern name, WHY, standard reference |
 | 6. Key Code Analysis | 800 | Line-by-line, execution examples, scenarios |
-| 7. Application Transfer | 500 | ≥ 2 scenarios, constant principles, modifications |
-| 8. Dependencies | 300 | WHY per dependency, usage examples |
-| 9. Quality Verification | 200 | Checklist, four abilities test |
+| 7. Test Case Analysis | 400 | Test structure, key tests, hidden behaviors (if tests available) |
+| 8. Application Transfer | 500 | ≥ 2 scenarios, constant principles, modifications |
+| 9. Dependencies | 300 | WHY per dependency, usage examples |
+| 10. Quality Verification | 200 | Checklist, four abilities test |
 
 **Total: Deep Mode document should be ≥ 4000 words**

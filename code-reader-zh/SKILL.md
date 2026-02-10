@@ -166,12 +166,20 @@ description: 基于认知科学的源代码深度理解助手（中文改进版�
 - 边界条件说明
 - 易错点标注
 
-## 8. 应用迁移场景（至少 2 个）
+## 8. 测试用例分析（如代码包含测试）
+- 测试文件清单与覆盖分析
+- 从测试中发现的边界条件
+- 测试驱动的理解验证
+
+## 9. 应用迁移场景（至少 2 个）
 - 场景 1：不变原理 + 修改部分 + WHY
 - 场景 2：不变原理 + 修改部分 + WHY
 - 提取通用模式
 
-## 9. 质量验证清单
+## 10. 依赖关系与使用示例
+- 详细的 WHY 注释
+
+## 11. 质量验证清单
 - 理解深度验证
 - 技术准确性验证
 - 实用性验证
@@ -266,9 +274,10 @@ description: 基于认知科学的源代码深度理解助手（中文改进版�
    章节_3_算法理论.md
    章节_4_设计模式.md
    章节_5_代码解析.md
-   章节_6_应用迁移.md
-   章节_7_依赖关系.md
-   章节_8_质量验证.md
+   章节_6_测试用例分析.md（如有）
+   章节_7_应用迁移.md
+   章节_8_依赖关系.md
+   章节_9_质量验证.md
    ```
 
 2. **合并顺序**
@@ -309,6 +318,7 @@ description: 基于认知科学的源代码深度理解助手（中文改进版�
       "算法与理论",
       "设计模式",
       "关键代码解析",
+      "测试用例分析",
       "应用迁移场景",
       "依赖关系",
       "质量验证"
@@ -414,9 +424,10 @@ description: 基于认知科学的源代码深度理解助手（中文改进版�
     "4. 算法与理论",
     "5. 设计模式",
     "6. 关键代码深度解析",
-    "7. 应用迁移场景",
-    "8. 依赖关系",
-    "9. 质量验证"
+    "7. 测试用例分析（如有）",
+    "8. 应用迁移场景",
+    "9. 依赖关系",
+    "10. 质量验证"
   ]
 
   对于每个 章节 in 章节列表:
@@ -916,7 +927,305 @@ Value getProducerOfTensor(Value tensor) {
 
 ---
 
-### 第 7 步：应用迁移测试（检验真实理解）
+### 第 6.5 步：测试用例反向理解（如有测试）
+
+**目标：** 通过测试用例反向验证和深化对代码功能的理解
+
+**为什么重要：**
+- 测试用例反映了代码的**预期行为**，是最准确的"使用说明书"
+- 测试通常覆盖**边界条件**和**异常场景**，这些在主代码中容易被忽略
+- 通过测试可以**验证理解是否正确**，避免产生错误的假设
+
+**当检测到代码包含测试文件时，必须执行此步骤。**
+
+#### 6.5.1 测试文件识别
+
+**常见测试文件模式：**
+
+| 语言 | 测试文件模式 | 测试目录结构 |
+|------|-------------|-------------|
+| **Python** | `test_*.py`, `*_test.py` | `tests/`, `test/` |
+| **JavaScript/TypeScript** | `*.test.ts`, `*.test.js` | `__tests__/`, `tests/` |
+| **Go** | `*_test.go` | 与源码同目录, `*_test.go` |
+| **Java** | `*Test.java`, `*Tests.java` | `src/test/java/` |
+| **C++** | `*.cpp` (包含测试), gtest | `test/`, `tests/`, `unittest/` |
+| **Rust** | `*_test.rs`, `tests/*.rs` | `tests/` |
+| **MLIR/LLVM** | `*.mlir` (测试文件) | `test/Dialect/*/` |
+
+**大型项目测试目录结构示例：**
+
+```bash
+# MLIR 风格（测试独立目录）
+mlir/test/Dialect/Linalg/
+├── ops.mlir           # Linalg 方言操作测试
+├── transformation.mlir # 变换测试
+├── interfaces.mlir    # 接口测试
+└── invalid.mlir       # 错误处理测试
+
+# 传统 C++ 项目风格
+project/test/
+├── unittest/          # 单元测试
+├── integration/       # 集成测试
+└── benchmark/         # 性能测试
+```
+
+#### 6.5.2 测试覆盖分析
+
+**分析测试覆盖的功能点：**
+
+```markdown
+## 测试用例覆盖分析
+
+### 测试文件清单
+| 测试文件/目录 | 测试的模块 | 测试用例数量 |
+|--------------|-----------|-------------|
+| `test/Dialect/Linalg/ops.mlir` | Linalg Ops | 156 |
+| `test/Dialect/Linalg/invalid.mlir` | 错误处理 | 43 |
+| `unittest/test_auth.cpp` | `authenticate_user()` | 12 |
+
+### 功能覆盖矩阵
+| 核心功能 | 主代码位置 | 测试覆盖 | 覆盖率评估 |
+|---------|-----------|---------|-----------|
+| linalg.matmul 操作 | `Dialect/Linalg/Ops/*` | ✅ 有测试 | 覆盖正常+边界 |
+| linalg.generic 接口 | `Interfaces/*` | ✅ 有测试 | 覆盖完整 |
+| Tile 变换 | `Transforms/Tiling.cpp` | ⚠️ 测试不足 | 缺少嵌套场景 |
+```
+
+#### 6.5.3 通过测试理解边界条件
+
+**从测试中提取关键边界条件：**
+
+```markdown
+## 从测试中发现的边界条件
+
+### MLIR 示例：理解 linalg.generic 的区域约束
+
+#### 测试文件：test/Dialect/Linalg/invalid.mlir
+```mlir
+// 测试：generic 的 region 必须有且仅有一个 block
+func.func @invalid_generic_empty_region(%arg0: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {indexing_maps = [affine_map<(d0) -> (d0)>],
+                     iterator_types = ["parallel"]}
+    outs(%arg0) {
+    // 空 region - 应该报错
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY 这个测试重要：**
+- 揭示了 `linalg.generic` 的**结构约束**：必须有 block
+- 通过**负向测试**（invalid test）明确错误条件
+- 边界条件：region 的 block 数量必须 = 1
+
+#### 测试文件：test/Dialect/Linalg/ops.mlir
+```mlir
+// 测试：输入和输出数量必须与 indexing_maps 一致
+func.func @generic_mismatched_maps(%a: tensor<10xf32>, %b: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {
+    indexing_maps = [
+      affine_map<(d0) -> (d0)>,  // 1 个输入的 map
+      affine_map<(d0) -> (d0)>   // 1 个输出的 map
+    ],
+    iterator_types = ["parallel"]
+  } ins(%a, %b : tensor<10xf32>, tensor<10xf32>)  // 但有 2 个输入
+  outs(%0 : tensor<10xf32>) {
+  ^bb0(%in: f32, %in_2: f32, %out: f32):
+    linalg.yield %in : f32
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY 这样处理：**
+- 验证了**类型系统约束**：输入/输出数量必须与 map 一致
+- 测试了**静态验证**逻辑，在编译期捕获错误
+- 说明了 MLIR 的**静态强类型**特性
+
+### C++ 示例：通过测试理解并发安全性
+
+#### 测试文件：unittest/concurrent_map_test.cpp
+```cpp
+// 测试：并发插入相同键
+TEST(ConcurrentMapTest, ConcurrentInsertSameKey) {
+  ConcurrentMap<int, int> map;
+  const int num_threads = 10;
+  const int key = 42;
+
+  std::vector<std::thread> threads;
+  for (int i = 0; i < num_threads; ++i) {
+    threads.emplace_back([&map, key, i]() {
+      map.Insert(key, i);  // 所有线程插入同一个 key
+    });
+  }
+
+  for (auto& t : threads) t.join();
+
+  // 验证：只有一个插入成功
+  EXPECT_EQ(map.Size(), 1);
+  EXPECT_TRUE(map.Contains(key));
+}
+```
+**WHY 这个测试存在：**
+- 验证了**线程安全性**：多线程并发访问不会崩溃
+- 说明了**冲突处理策略**：后插入覆盖先插入（或反之）
+- 测试了**一致性保证**：最终状态符合预期
+```
+
+#### 6.5.4 测试驱动理解示例
+
+**完整示例：通过 MLIR 测试理解 `linalg.tile` 变换**
+
+```markdown
+## 测试用例反向理解：linalg.tile 变换
+
+### 问题：仅看文档能理解 tile 的全部行为吗？
+
+**文档说明（简化）：**
+> `linalg.tile` 将 linalg 操作分解为更小的片段
+
+**可能遗漏的细节：**
+1. Tile 大小如何确定？
+2. 支持哪些操作的 tile？
+3. Tile 后的循环顺序是什么？
+4. 如何处理剩余元素？
+
+### 从测试中发现的答案
+
+#### 测试 1：test/tile-mlir.mlir - 基本 tile 行为
+```mlir
+// 原始操作
+%0 = linalg.matmul ins(%A: tensor<128x128xf32>, %B: tensor<128x128xf32>)
+                     outs(%C: tensor<128x128xf32>)
+
+// Tile 大小为 32x32
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**发现：** Tile 大小直接指定，输出包含嵌套循环结构
+
+#### 测试 2：test/tile-mlir.mlir - 剩余元素处理
+```mlir
+// 127x127 矩阵，tile 大小 32x32
+%0 = linalg.matmul ins(%A: tensor<127x127xf32>, ...)
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**发现：** 自动生成边界检查处理不均匀的剩余部分
+
+#### 测试 3：test/tile-mlir.mlir - 不可 tile 的操作
+```mlir
+// 尝试 tile 不支持的操作
+%0 = linalg.generic ...
+%1 = linalg.tile %0 tile_sizes[16]
+// 预期：编译错误或运行时失败
+```
+**发现：** 并非所有操作都支持 tile，有明确的限制条件
+
+### 测试前后理解对比
+
+| 问题 | 仅看文档 | 看测试后 |
+|-----|---------|---------|
+| Tile 大小如何指定？ | ⚠️ 不清楚 | ✅ 直接作为参数 |
+| 剩余元素如何处理？ | ❓ 文档未提及 | ✅ 自动边界检查 |
+| 支持哪些操作？ | ❓ 列表不完整 | ✅ 测试覆盖所有支持的操作 |
+| 循环顺序是什么？ | ⚠️ 描述模糊 | ✅ 从测试 IR 可看出顺序 |
+
+**结论：** 测试用例补充了约 **50%** 的实现细节！
+```
+
+#### 6.5.5 不同语言测试文件解析要点
+
+**各语言测试的注意点：**
+
+```markdown
+## 各语言测试文件解析要点
+
+### Python (pytest/unittest)
+- 查找 `test_*.py` 或 `*_test.py`
+- 注意 `@pytest.mark.parametrize` 参数化测试
+- 关注 `pytest.raises` 异常测试
+- 查找 fixtures (`conftest.py`) 了解测试上下文
+
+### C++ (gtest/gtest)
+- 查找 `*_test.cpp` 或 `test/*.cpp`
+- `TEST_F` 表示 fixture 测试，有前置条件
+- `EXPECT_*` vs `ASSERT_*`：失败后是否继续
+- `TEST_P` 表示参数化测试
+
+### MLIR/LLVM
+- 测试文件通常是 `.mlir` 或 `.td`
+- `RUN:` 命令指定如何执行测试
+- `// EXPECTED:` 标记预期输出
+- `// ERROR:` 标记预期的编译错误
+- FileCheck 指令：`CHECK-`, `CHECK-NOT:`, `CHECK-DAG:`
+
+### JavaScript/TypeScript (Jest)
+- `*.test.ts`, `*.spec.ts`
+- `describe/it` 嵌套结构
+- `expect(...).toThrow()` 异常测试
+- `beforeEach/afterEach` 钩子函数
+
+### Go
+- 测试与源码在同一目录：`*_test.go`
+- `TestXxx(t *testing.T)` 基础测试
+- `TableDrivenTests` 表格驱动测试
+- `TestMain` 测试入口
+
+### Rust
+- `*_test.rs` 内嵌测试
+- `tests/` 目录集成测试
+- `#[should_panic]` 异常测试
+- `#[ignore]` 跳过的测试
+```
+
+#### 6.5.6 测试质量评估
+
+**评估测试是否充分：**
+
+```markdown
+## 测试质量评估
+
+### 覆盖的功能点
+- ✅ 正常流程
+- ✅ 边界输入
+- ✅ 异常输入
+- ⚠️ 并发场景
+- ❌ 性能测试
+
+### MLIR 特定评估
+- ✅ 正向测试（valid.mlir）
+- ✅ 负向测试（invalid.mlir）
+- ⚠️ 性能回归测试
+- ❌ 跨方言交互测试
+
+### 测试缺失警告
+> ⚠️ **警告：该模块测试覆盖不足**
+> - 未覆盖场景：[具体列出]
+> - 建议补充：[具体建议]
+```
+
+#### 6.5.7 测试用例分析输出模板
+
+```markdown
+## 测试用例分析
+
+### 测试文件结构
+[列出测试文件/目录及其对应的源码模块]
+
+### 关键测试用例解读
+[选择 3-5 个最有价值的测试用例]
+
+### 从测试中发现的隐藏行为
+[列出仅看代码容易遗漏的细节]
+
+### 测试覆盖度评估
+- 核心功能覆盖率：X%
+- 边界条件覆盖：[充分/不足]
+
+### 测试质量建议
+[如测试不足，提出改进建议]
+```
+
+---
+
+### 第 9 步：应用迁移测试（检验真实理解）
 
 **目标：** 测试概念能否应用到不同场景
 
@@ -1043,7 +1352,7 @@ def quicksort_logs(log_file, output_file, memory_limit):
 
 ---
 
-### 第 8 步：依赖关系与使用示例
+### 第 10 步：依赖关系与使用示例
 
 （与原版类似，但增加 WHY 解释）
 
@@ -1147,7 +1456,7 @@ Token 示例："eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 ---
 
-### 第 9 步：自我评估检查清单
+### 第 11 步：自我评估检查清单
 
 **分析完成后，强制验证以下项目：**
 
@@ -1258,14 +1567,19 @@ Token 示例："eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ## 6. 关键代码深度解析
 - 每个代码段：逐行解析（做什么 + WHY） + 执行示例 + 关键要点
 
-## 7. 应用迁移场景（至少 2 个）
+## 7. 测试用例分析（如有）
+- 测试文件清单与覆盖分析
+- 从测试中发现的边界条件
+- 测试驱动的理解验证
+
+## 8. 应用迁移场景（至少 2 个）
 - 每个场景：不变的原理 + 需要修改的部分 + WHY 这样迁移
 
-## 8. 依赖关系与使用示例
+## 9. 依赖关系与使用示例
 - 每个依赖：WHY 选择 + WHY 不用其他
 - 示例包含详细 WHY 注释
 
-## 9. 质量验证清单
+## 10. 质量验证清单
 [检查所有验证项]
 ```
 
@@ -1649,8 +1963,9 @@ Task(
 | 4. 算法与理论 | 500 | 复杂度、WHY、参考资料 |
 | 5. 设计模式 | 400 | 模式名、WHY、标准参考 |
 | 6. 关键代码解析 | 800 | 逐行解析、执行示例、场景追踪 |
-| 7. 应用迁移 | 500 | 至少 2 场景、不变原理、修改部分 |
-| 8. 依赖关系 | 300 | 每依赖的 WHY、使用示例 |
-| 9. 质量验证 | 200 | 验证清单、四能测试 |
+| 7. 测试用例分析 | 400 | 测试覆盖、边界条件、测试发现 |
+| 8. 应用迁移 | 500 | 至少 2 场景、不变原理、修改部分 |
+| 9. 依赖关系 | 300 | 每依赖的 WHY、使用示例 |
+| 10. 质量验证 | 200 | 验证清单、四能测试 |
 
-**总计：Deep Mode 文档应 ≥ 4000 字**
+**总计：Deep Mode 文档应 ≥ 4300 字**
