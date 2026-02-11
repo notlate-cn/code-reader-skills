@@ -5,7 +5,7 @@
 **基于认知科学的源代码深度理解工具 | Cognitive Science-Based Code Analysis Tool**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.2.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
+[![Version](https://img.shields.io/badge/version-2.3.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
 [![Claude Skills](https://img.shields.io/badge/Claude-Skills-orange.svg)](https://claude.ai)
 [![Language](https://img.shields.io/badge/language-中文%20%7C%20English-red.svg)](#)
 
@@ -31,6 +31,7 @@
 - 🚀 **应用迁移测试** - 检验能否在不同场景应用
 - 📚 **学术研究支撑** - 基于 Dunlosky, Chi, Karpicke 等认知科学研究
 - ⚡ **三种模式** - Quick/Standard/Deep 满足不同需求
+- 🤖 **智能并行** - Deep Mode 大型项目自动使用并行处理
 
 ### 📦 文件结构
 
@@ -64,11 +65,13 @@ cd code-reader-skills
 
 | 模式 | 耗时 | 适用场景 | 触发词示例 |
 |------|------|---------|-----------|
-| **Quick** | 5-10 分钟 | 快速浏览、代码审查 | "快速分析"、"简单看看" |
-| **Standard** | 15-20 分钟 | 学习理解、技术调研 ⭐ | "深入分析"、"帮我理解" |
-| **Deep** | 30+ 分钟 | 面试准备、完全掌握 | "彻底分析"、"我要掌握" |
+| **Quick** | 5-10 分钟 | 快速浏览、代码审查 | "快速看一下"、"这段代码干嘛的" |
+| **Standard** | 15-20 分钟 | 学习理解、技术调研 ⭐ | "分析一下"、"帮我理解"、"解释一下" |
+| **Deep** | 30+ 分钟 | 深度掌握、大型项目 🚀 | "彻底分析"、"完全掌握"、"深入研究" |
 
 **默认使用 Standard Mode**
+
+**🚀 Deep Mode 内部智能策略：代码 ≤ 2000 行使用渐进式生成，代码 > 2000 行自动启用并行处理。**
 
 #### 3. 安装 Skill
 
@@ -133,6 +136,12 @@ message = client.messages.create(
 [上传或粘贴代码]
 ```
 
+**大型项目自动触发并行处理：**
+```
+你：/code-reader-v2-cn 彻底分析这个项目
+[上传或粘贴代码，系统检测到 >2000 行时自动使用并行处理]
+```
+
 ### 📊 输出结构
 
 #### Quick Mode（快速概览）
@@ -153,14 +162,16 @@ message = client.messages.create(
 7. 💻 关键代码深度解析（场景化注释）
 8. 📦 依赖与使用示例
 
-#### Deep Mode（完全掌握）
+#### Deep Mode（完全掌握）🚀
 [包含 Standard Mode 所有内容，加上]
 - 🔗 概念网络图
 - 📊 完整执行示例（多场景追踪）
+- 🧪 **测试用例分析**（如有测试，通过测试反向理解代码）
 - 🚀 应用迁移场景（至少 2 个）
 - ✅ 质量验证清单
-- 📝 渐进式生成（确保深度）
-- 💾 直接写入文件（Token 优化）
+- 🤖 **智能策略选择**：代码 ≤ 2000 行使用渐进式生成，代码 > 2000 行自动启用并行处理
+  - 并行处理时：主协调 Agent + 并行子 Agents + 自动汇总
+  - 确保每个章节都有充分深度
 
 ### 💡 使用示例
 
@@ -244,6 +255,26 @@ def authenticate_user(username, password):
 
 ### 📝 更新日志
 
+#### v2.3.0 (2026-02-07)
+
+**重构优化：**
+- 🔄 合并 Parallel Deep Mode 到 Deep Mode，作为内部策略
+- ⚡ 优化触发词系统，丰富各模式触发词
+- 🤖 Deep Mode 内部智能选择：≤2000 行渐进式，>2000 行自动并行
+- 📖 简化为三种模式：Quick/Standard/Deep
+- 🧪 新增测试用例反向理解功能（Step 6.5）
+
+**改进：**
+- 🎯 用户体验更友好，无需手动选择并行模式
+- 📝 更新中英文 SKILL.md 和 README 文档
+- 🔬 支持通过测试用例反向验证和深化理解
+- 🛠️ 支持 C++、MLIR/LLVM 等多种语言测试格式
+
+**解决问题：**
+- ✅ 解决模式过于冗余的问题
+- ✅ 自动策略选择降低使用门槛
+- ✅ 通过测试发现代码中隐藏的行为和边界条件
+
 #### v2.2.0 (2026-02-04)
 
 **新增功能：**
@@ -307,7 +338,8 @@ A professional Claude Skills set that helps developers **truly understand** sour
 - 🚀 **Application Transfer Test** - Examine if applicable in different scenarios
 - 📚 **Academic Research Support** - Based on Dunlosky, Chi, Karpicke's cognitive science research
 - 🌐 **Bilingual Support** - Complete Chinese and English versions
-- ⚡ **Three Modes** - Quick/Standard/Deep for different needs
+- ⚡ **Four Modes** - Quick/Standard/Deep/Parallel Deep for different needs
+- 🤖 **Parallel Analysis** - Sub-agents process chapters in parallel, ensuring depth for large projects
 
 ### 📦 File Structure
 
@@ -339,11 +371,13 @@ cd code-reader-skills
 
 | Mode | Duration | Use Case | Trigger Examples |
 |------|----------|----------|------------------|
-| **Quick** | 5-10 min | Quick browse, code review | "quickly analyze", "briefly look" |
-| **Standard** | 15-20 min | Learning, research ⭐ | "deeply analyze", "help me understand" |
-| **Deep** | 30+ min | Interview prep, mastery | "thoroughly analyze", "I need to master this" |
+| **Quick** | 5-10 min | Quick browse, code review | "quick look", "what does this do" |
+| **Standard** | 15-20 min | Learning, research ⭐ | "analyze", "help me understand", "explain" |
+| **Deep** | 30+ min | Deep mastery, large projects 🚀 | "thoroughly analyze", "completely master", "in-depth research" |
 
 **Default: Standard Mode**
+
+**🚀 Deep Mode internal smart strategy: Code ≤ 2000 lines uses progressive generation, code > 2000 lines auto-enables parallel processing.**
 
 #### 3. Install Skill
 
@@ -408,6 +442,12 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 [Upload or paste code]
 ```
 
+**Parallel Deep Mode Trigger Example:**
+```
+You: /code-reader-v2-en Thoroughly analyze this large project
+[Upload or paste code, system will auto-use parallel processing when >2000 lines detected]
+```
+
 ### 📊 Output Structure
 
 #### Quick Mode
@@ -428,14 +468,16 @@ You: /code-reader-v2-en I need to thoroughly master this algorithm for interview
 7. Key Code Deep Analysis (Scenario-based comments)
 8. Dependencies & Usage Examples
 
-#### Deep Mode
+#### Deep Mode 🚀
 [All Standard Mode content, plus]
 - Concept Network Diagram
 - Complete Execution Examples (Multi-scenario tracking)
+- **Test Case Analysis** (if tests exist, reverse-understand code through tests)
 - Application Transfer Scenarios (at least 2)
 - Quality Verification Checklist
-- Progressive Generation (Ensure depth)
-- Direct File Writing (Token optimized)
+- **Smart Strategy Selection**: Code ≤ 2000 lines uses progressive, code > 2000 lines auto-enables parallel processing
+  - Parallel processing: Master coordinator Agent + parallel sub-agents + auto-aggregation
+  - Ensures sufficient depth for each chapter
 
 ### 🔬 Research Foundation
 
@@ -462,7 +504,7 @@ Contributions are welcome! Here's how to participate:
 **A:**
 - **Quick**: Fast understanding of structure and functionality, 5-10 min
 - **Standard**: Understand WHY and design rationale, 15-20 min (Recommended)
-- **Deep**: Application transfer testing + quality verification, 30+ min
+- **Deep**: Application transfer testing + quality verification, 30+ min. Auto-uses parallel processing for large projects (>2000 lines)
 </details>
 
 <details>
@@ -484,6 +526,26 @@ Contributions are welcome! Here's how to participate:
 </details>
 
 ### 📝 Changelog
+
+#### v2.3.0 (2026-02-07)
+
+**Refactor:**
+- 🔄 Merge Parallel Deep Mode into Deep Mode as internal strategy
+- ⚡ Optimize trigger word system, enrich trigger words for each mode
+- 🤖 Deep Mode smart selection: ≤2000 lines progressive, >2000 lines auto-parallel
+- 📖 Simplify to 3 modes: Quick/Standard/Deep
+- 🧪 Add test case reverse understanding feature (Step 6.5)
+
+**Improvements:**
+- 🎯 Better UX, no manual parallel mode selection needed
+- 📝 Updated Chinese/English SKILL.md and README
+- 🔬 Support reverse-understanding code through test cases
+- 🛠️ Support C++, MLIR/LLVM and other language test formats
+
+**Problems Solved:**
+- ✅ Fixed redundant modes issue
+- ✅ Auto strategy selection lowers usage barrier
+- ✅ Discover hidden behaviors and boundary conditions through tests
 
 #### v2.2.0 (2026-02-04)
 

@@ -1,9 +1,9 @@
 ---
 name: code-reader-v2-en
-description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick (5-10 min), Standard (15-20 min), Deep (30+ min). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code. Trigger words "deeply analyze this code," "help me understand this algorithm," "quickly analyze this code."
+description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick, Standard, Deep (auto-parallel for large projects). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code.
 ---
 
-# Source Code Deep Understanding Analyzer v2.0
+# Source Code Deep Understanding Analyzer v2.3
 
 Professional code analysis tool based on cognitive science research, supporting three analysis depths to ensure true understanding rather than fluency illusion.
 
@@ -11,11 +11,15 @@ Professional code analysis tool based on cognitive science research, supporting 
 
 | User Intent | Recommended Mode | Trigger Examples | Duration |
 |-------------|-----------------|------------------|----------|
-| Quick browse/code review | Quick Mode | "quickly analyze", "briefly look", "what does this do" | 5-10 min |
-| Learning/technical research | Standard Mode ⭐ | "deeply analyze", "help me understand", "explain principles" | 15-20 min |
-| Interview prep/complete mastery | Deep Mode | "thoroughly analyze", "I need to master this", "interview related" | 30+ min |
+| Quick browse/code review | Quick Mode | "quick look", "what does this do", "briefly scan" | 5-10 min |
+| Learning/technical research | Standard Mode ⭐ | "analyze", "help me understand", "explain" | 15-20 min |
+| Deep mastery/large projects | Deep Mode 🚀 | "thoroughly analyze", "completely master", "in-depth research", "interview prep", "project analysis" | 30+ min |
 
-**Default: Standard Mode unless user specifies otherwise.**
+**Default: Standard Mode, system auto-selects optimal mode based on code scale and user intent.**
+
+**🚀 Deep Mode internal smart strategy:**
+- Code ≤ 2000 lines: Progressive generation (sequential chapter filling)
+- Code > 2000 lines: Auto-enable parallel processing (sub-agents analyze chapters in parallel)
 
 ---
 
@@ -135,13 +139,22 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Line-by-line WHY analysis
 - Execution flow examples
 
-## 7. Dependencies & Usage Examples
+## 7. Test Case Analysis (if tests available)
+- Test coverage analysis
+- Boundary conditions from tests
+- Hidden behaviors discovered
+
+## 8. Dependencies & Usage Examples
 - Detailed WHY comments
 ```
 
-### Deep Mode Output Structure (30+ min) - Progressive Generation
+### Deep Mode Output Structure (30+ min)
 
-**Use progressive generation strategy to ensure every chapter has sufficient depth:**
+**Deep Mode auto-selects optimal strategy based on code scale, ensuring sufficient depth for each chapter:**
+
+#### Strategy A: Progressive Generation (Code ≤ 2000 lines)
+
+**For medium-small code, generate chapters sequentially:**
 
 ```markdown
 # [Code Name] Complete Mastery Analysis
@@ -158,94 +171,218 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Boundary conditions
 - Error-prone points
 
+## 7. Test Case Analysis (if tests available)
+- Test coverage analysis
+- Key test case interpretations
+- Hidden behaviors discovered from tests
+
 ## 8. Application Transfer Scenarios (at least 2)
 - Scenario 1: Constant principles + modifications + WHY
 - Scenario 2: Constant principles + modifications + WHY
 - Extract universal patterns
 
-## 9. Quality Verification Checklist
+## 10. Quality Verification Checklist
 - Understanding depth verification
 - Technical accuracy verification
 - Practicality verification
 - Final "four abilities" test
 ```
 
-**Progressive Generation Flow (Deep Mode Exclusive):**
+#### Strategy B: Parallel Processing (Code > 2000 lines) 🚀
 
-| Phase | Operation | Depth Assurance Mechanism |
-|-------|-----------|--------------------------|
-| **1. Framework** | Generate full TOC + chapter placeholders | Plan structure upfront, avoid omissions |
-| **2. Fill Chapters** | Process each chapter sequentially | Focus on one chapter at a time, fully develop |
-| **3. Depth Check** | Self-check after each chapter | Verify Deep Mode standards met |
-| **4. Reinforce** | Append content to weak chapters | Targeted supplementation of insufficient parts |
+**For large projects, using sub-agent parallel architecture:**
 
-**Depth Standards for Each Chapter:**
+#### Core Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Master Coordinator Agent                  │
+│  - Generate analysis outline and directory framework        │
+│  - Identify core concepts list (shared with sub-agents)     │
+│  - Assign chapter tasks                                     │
+│  - Aggregate sub-agent results                              │
+│  - Final quality verification                               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+            ┌─────────────────┼─────────────────┐
+            ▼                 ▼                 ▼
+    ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+    │ Sub-Agent 1 │   │ Sub-Agent 2 │   │ Sub-Agent 3 │
+    │ Background  │   │ Core        │   │ Algorithm   │
+    │ & Motivation│   │ Concepts    │   │ & Theory    │
+    └─────────────┘   └─────────────┘   └─────────────┘
+            │                 │                 │
+            └─────────────────┼─────────────────┘
+                              ▼
+    ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+    │ Sub-Agent 4 │   │ Sub-Agent 5 │   │ Sub-Agent 6 │
+    │ Design      │   │ Code        │   │ Application │
+    │ Patterns    │   │ Analysis    │   │ Transfer    │
+    └─────────────┘   └─────────────┘   └─────────────┘
+```
+
+#### Parallel Execution Flow
+
+| Phase | Executor | Operation | Output |
+|-------|----------|-----------|--------|
+| **1. Framework Prep** | Master Agent | Quick code overview, generate outline and core concepts | `framework.md` |
+| **2. Task Dispatch** | Master Agent | Create independent task descriptions for each chapter | Task list |
+| **3. Parallel Processing** | Sub-Agents | Each sub-agent focuses on one chapter, generates with depth | `chapter-N.md` |
+| **4. Result Aggregation** | Master Agent | Merge all chapters, unify format | `complete-analysis.md` |
+| **5. Quality Verification** | Master Agent | Check depth standards, supplement weak sections | Final document |
+
+#### Chapter Task Definition (Template for Sub-Agents)
 
 ```markdown
-## Depth Self-Check Checklist (After Each Chapter)
+# Sub-Agent Task: [Chapter Name]
 
-### Content Completeness
-- [ ] All chapter subsections covered (no "skipped" or "same as above")
-- [ ] Every WHY has specific explanation (not just one sentence)
-- [ ] Code examples have complete comments (Scenario/Step + WHY)
+## Context Information
+- **Code Name:** [Project/Code Name]
+- **Programming Language:** [Language]
+- **Code Scale:** [Line Count]
+- **Core Concepts:** [Concept list passed from master agent]
 
-### Analysis Depth
-- [ ] Core concepts have 3 WHYs fully answered
-- [ ] Algorithms have complexity analysis + rationale
-- [ ] Design patterns have WHY used + what happens without
+## Your Task
+You are the analysis expert specializing in "**[Chapter Name]**". Please deeply analyze this chapter and generate detailed content.
+
+## Output Requirements
+1. **Content Depth:** This chapter must be at least [X] words
+2. **WHY Analysis:** Each key point must answer 3 WHYs
+3. **Code Comments:** Use Scenario/Step + WHY style
+4. **Source References:** Provide authoritative reference links
+5. **Independence:** Generate complete independent chapter content, no need to reference other chapters
+
+## Output Format
+Output Markdown format chapter content directly, starting with `## [Chapter Name]`.
+
+## Depth Standards
+- [ ] All subsections covered (no "skipped" or "same as above")
+- [ ] Each WHY has at least 2-3 sentences of explanation
+- [ ] Code examples have complete comments
 - [ ] Execution flows have concrete data tracking
 
-### Practicality
-- [ ] Error-prone points marked
-- [ ] Boundary conditions explained
-- [ ] At least 2 application transfer scenarios
+Begin analysis:
 ```
 
-**Implementation (Pseudocode Flow):**
+#### Master Agent Aggregation Logic
+
+```markdown
+# Parallel Deep Mode Aggregation Specification
+
+## Aggregation Steps
+
+1. **Read All Sub-chapters**
+   ```
+   chapter_1_background.md
+   chapter_2_concepts.md
+   chapter_3_algorithm.md
+   chapter_4_patterns.md
+   chapter_5_code_analysis.md
+   chapter_6_test_analysis.md
+   chapter_7_transfer.md
+   chapter_8_dependencies.md
+   chapter_9_verification.md
+   ```
+
+2. **Merge Order**
+   ```markdown
+   # [Code Name] Complete Mastery Analysis (Parallel Deep Edition)
+
+   ## Understanding Verification Status
+   [Generated from master agent's preliminary analysis]
+
+   [Insert each chapter content in order]
+   ```
+
+3. **Cross-Check**
+   - Core concepts have consistent definitions across chapters
+   - WHY explanations have no contradictions
+   - Referenced code examples are consistent
+
+4. **Depth Verification**
+   - Each chapter meets word count requirements
+   - WHY analysis is thorough
+   - Execution examples are complete
+```
+
+#### Implementation Pseudocode
 
 ```
-Function: DeepModeProgressiveGeneration(code, filePath):
+Function: ParallelDeepMode(code, workDirectory):
 
-  // Phase 1: Generate framework
-  framework = GenerateFullTOC(StandardStructure + DeepExtensions)
-  WriteFile(filePath, framework)
+  // ========== Phase 1: Framework Preparation ==========
+  framework = {
+    "code_name": ExtractName(code),
+    "language": IdentifyLanguage(code),
+    "code_scale": CountLines(code),
+    "core_concepts": ExtractCoreConcepts(code),  // Shared with all sub-agents
+    "chapter_list": [
+      "Background & Motivation",
+      "Core Concepts",
+      "Algorithm & Theory",
+      "Design Patterns",
+      "Key Code Analysis",
+      "Test Case Analysis",
+      "Application Transfer Scenarios",
+      "Dependencies",
+      "Quality Verification"
+    ]
+  }
 
-  // Phase 2: Fill chapter by chapter
-  chapters = [
-    "1. Quick Overview",
-    "2. Background & Motivation",
-    "3. Core Concepts",
-    "4. Algorithm & Theory",
-    "5. Design Patterns",
-    "6. Key Code Deep Analysis",
-    "7. Application Transfer",
-    "8. Dependencies",
-    "9. Quality Verification"
-  ]
+  WriteFile(f"{workDirectory}/00-framework.json", framework)
 
-  for each chapter in chapters:
-    currentContent = ReadFile(filePath)
+  // ========== Phase 2: Create Sub-Tasks ==========
+  subTaskList = []
 
-    // Generate chapter content (single focus, ensure depth)
-    chapterContent = DeepGenerateChapter(chapter, code)
-    // Requirement: Each chapter ≥ 300-500 words, code has full comments
+  for each chapter in framework["chapter_list"]:
+    taskDescription = GenerateTaskTemplate(chapter, framework)
+    taskFile = f"{workDirectory}/tasks/{chapter}-task.md"
+    WriteFile(taskFile, taskDescription)
+    subTaskList.append(taskFile)
 
-    // Depth self-check
-    if not PassDepthCheck(chapterContent):
-      chapterContent = AppendDetails(chapterContent)
+  // ========== Phase 3: Execute Sub-Agents in Parallel ==========
+  // Note: Actual execution via Task tool creating parallel sub-agents
 
-    // Update file
-    newContent = currentContent.replace(chapterPlaceholder, chapterContent)
-    WriteFile(filePath, newContent)
+  chapterFileList = []
 
-  // Phase 3: Overall validation
-  fullDoc = ReadFile(filePath)
-  if not PassOverallCheck(fullDoc):
-    weakChapters = IdentifyWeakParts(fullDoc)
-    for chapter in weakChapters:
-      SupplementContent(chapter)
+  for each taskFile in subTaskList:
+    // Create sub-agent (parallel execution)
+    subAgent = CreateAgent(
+      name: f"Analyze-{chapter}",
+      task: ReadFile(taskFile),
+      code: code,
+      outputFile: f"{workDirectory}/chapters/{chapter}.md"
+    )
 
-  return filePath
+    // Start parallel execution
+    subAgent.start(parallel=True)
+    chapterFileList.append(subAgent.outputFile)
+
+  // Wait for all sub-agents to complete
+  WaitAll(chapterFileList)
+
+  // ========== Phase 4: Result Aggregation ==========
+  completeDoc = "# {framework['code_name']} Complete Mastery Analysis\n\n"
+  completeDoc += "## Understanding Verification Status\n\n"
+  completeDoc += GenerateVerificationTable(framework) + "\n\n"
+
+  for each chapterFile in chapterFileList:
+    chapterContent = ReadFile(chapterFile)
+    completeDoc += chapterContent + "\n\n"
+
+  // ========== Phase 5: Quality Verification ==========
+  if not PassDepthCheck(completeDoc):
+    weakChapters = IdentifyWeakParts(completeDoc)
+    for each chapter in weakChapters:
+      // Re-execute that chapter's sub-agent, requiring deeper content
+      ReExecute(chapter)
+      completeDoc = UpdateChapter(completeDoc, chapter)
+
+  // ========== Final Output ==========
+  finalFile = f"{workDirectory}/{framework['code_name']}-complete-mastery-analysis.md"
+  WriteFile(finalFile, completeDoc)
+
+  return finalFile
 ```
 
 ---
@@ -720,7 +857,305 @@ Duration: ~100ms (similar to successful auth)
 
 ---
 
-### Step 7: Application Transfer Test (Verify True Understanding)
+### Step 6.5: Test Case Reverse Understanding (If Tests Available)
+
+**Goal:** Verify and deepen understanding of code functionality through test cases
+
+**Why it's important:**
+- Test cases reflect the **expected behavior** of code, serving as the most accurate "user manual"
+- Tests typically cover **boundary conditions** and **exception scenarios** that are easily overlooked in main code
+- Tests can **verify whether understanding is correct**, avoiding incorrect assumptions
+
+**When test files are detected in code, this step is mandatory.**
+
+#### 6.5.1 Test File Identification
+
+**Common test file patterns:**
+
+| Language | Test File Pattern | Test Directory Structure |
+|----------|-------------------|-------------------------|
+| **Python** | `test_*.py`, `*_test.py` | `tests/`, `test/` |
+| **JavaScript/TypeScript** | `*.test.ts`, `*.test.js` | `__tests__/`, `tests/` |
+| **Go** | `*_test.go` | Same directory as source, `*_test.go` |
+| **Java** | `*Test.java`, `*Tests.java` | `src/test/java/` |
+| **C++** | `*.cpp` (with tests), gtest | `test/`, `tests/`, `unittest/` |
+| **Rust** | `*_test.rs`, `tests/*.rs` | `tests/` |
+| **MLIR/LLVM** | `*.mlir` (test files) | `test/Dialect/*/` |
+
+**Large project test directory structure examples:**
+
+```bash
+# MLIR style (separate test directory)
+mlir/test/Dialect/Linalg/
+├── ops.mlir           # Linalg dialect operation tests
+├── transformation.mlir # Transformation tests
+├── interfaces.mlir    # Interface tests
+└── invalid.mlir       # Error handling tests
+
+# Traditional C++ project style
+project/test/
+├── unittest/          # Unit tests
+├── integration/       # Integration tests
+└── benchmark/         # Performance tests
+```
+
+#### 6.5.2 Test Coverage Analysis
+
+**Analyze functionality points covered by tests:**
+
+```markdown
+## Test Case Coverage Analysis
+
+### Test File Inventory
+| Test File/Directory | Module Tested | Test Case Count |
+|---------------------|--------------|----------------|
+| `test/Dialect/Linalg/ops.mlir` | Linalg Ops | 156 |
+| `test/Dialect/Linalg/invalid.mlir` | Error Handling | 43 |
+| `unittest/test_auth.cpp` | `authenticate_user()` | 12 |
+
+### Functionality Coverage Matrix
+| Core Function | Main Code Location | Test Coverage | Coverage Assessment |
+|--------------|-------------------|--------------|---------------------|
+| linalg.matmul operation | `Dialect/Linalg/Ops/*` | ✅ Has tests | Normal + boundary covered |
+| linalg.generic interface | `Interfaces/*` | ✅ Has tests | Complete coverage |
+| Tile transformation | `Transforms/Tiling.cpp` | ⚠️ Insufficient tests | Missing nested scenarios |
+```
+
+#### 6.5.3 Understanding Boundary Conditions from Tests
+
+**Extract key boundary conditions from tests:**
+
+```markdown
+## Boundary Conditions Discovered from Tests
+
+### MLIR Example: Understanding linalg.generic Region Constraints
+
+#### Test File: test/Dialect/Linalg/invalid.mlir
+```mlir
+// Test: generic's region must have exactly one block
+func.func @invalid_generic_empty_region(%arg0: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {indexing_maps = [affine_map<(d0) -> (d0)>],
+                     iterator_types = ["parallel"]}
+    outs(%arg0) {
+    // Empty region - should error
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY this test is important:**
+- Reveals `linalg.generic`'s **structural constraint**: Must have a block
+- Through **negative testing** (invalid test) clarifies error conditions
+- Boundary condition: region's block count must = 1
+
+#### Test File: test/Dialect/Linalg/ops.mlir
+```mlir
+// Test: Input and output counts must match indexing_maps
+func.func @generic_mismatched_maps(%a: tensor<10xf32>, %b: tensor<10xf32>) -> tensor<10xf32> {
+  %0 = linalg.generic {
+    indexing_maps = [
+      affine_map<(d0) -> (d0)>,  // 1 input map
+      affine_map<(d0) -> (d0)>   // 1 output map
+    ],
+    iterator_types = ["parallel"]
+  } ins(%a, %b : tensor<10xf32>, tensor<10xf32>)  // But 2 inputs
+  outs(%0 : tensor<10xf32>) {
+  ^bb0(%in: f32, %in_2: f32, %out: f32):
+    linalg.yield %in : f32
+  } -> tensor<10xf32>
+  return %0 : tensor<10xf32>
+}
+```
+**WHY handled this way:**
+- Validates **type system constraint**: Input/output count must match maps
+- Tests **static verification** logic, catching errors at compile time
+- Illustrates MLIR's **static strong typing** characteristic
+
+### C++ Example: Understanding Thread Safety through Tests
+
+#### Test File: unittest/concurrent_map_test.cpp
+```cpp
+// Test: Concurrent insert of same key
+TEST(ConcurrentMapTest, ConcurrentInsertSameKey) {
+  ConcurrentMap<int, int> map;
+  const int num_threads = 10;
+  const int key = 42;
+
+  std::vector<std::thread> threads;
+  for (int i = 0; i < num_threads; ++i) {
+    threads.emplace_back([&map, key, i]() {
+      map.Insert(key, i);  // All threads insert same key
+    });
+  }
+
+  for (auto& t : threads) t.join();
+
+  // Verify: Only one insert succeeded
+  EXPECT_EQ(map.Size(), 1);
+  EXPECT_TRUE(map.Contains(key));
+}
+```
+**WHY this test exists:**
+- Verifies **thread safety**: Multi-threaded concurrent access won't crash
+- Illustrates **conflict handling strategy**: Later inserts overwrite earlier (or vice versa)
+- Tests **consistency guarantee**: Final state meets expectations
+```
+
+#### 6.5.4 Test-Driven Understanding Example
+
+**Complete example: Understanding `linalg.tile` transformation through MLIR tests**
+
+```markdown
+## Test Case Reverse Understanding: linalg.tile Transformation
+
+### Question: Can we understand all tile behavior from documentation alone?
+
+**Documentation description (simplified):**
+> `linalg.tile` decomposes linalg operations into smaller fragments
+
+**Potentially missed details:**
+1. How is tile size determined?
+2. Which operations support tile?
+3. What's the loop order after tile?
+4. How are remaining elements handled?
+
+### Answers Discovered from Tests
+
+#### Test 1: test/tile-mlir.mlir - Basic tile behavior
+```mlir
+// Original operation
+%0 = linalg.matmul ins(%A: tensor<128x128xf32>, %B: tensor<128x128xf32>)
+                     outs(%C: tensor<128x128xf32>)
+
+// Tile size 32x32
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**Discovery:** Tile size directly specified, output contains nested loop structure
+
+#### Test 2: test/tile-mlir.mlir - Remaining element handling
+```mlir
+// 127x127 matrix, tile size 32x32
+%0 = linalg.matmul ins(%A: tensor<127x127xf32>, ...)
+%1 = linalg.tile %0 tile_sizes[32, 32]
+```
+**Discovery:** Auto-generates boundary checks for uneven remainders
+
+#### Test 3: test/tile-mlir.mlir - Non-tileable operations
+```mlir
+// Try tiling unsupported operation
+%0 = linalg.generic ...
+%1 = linalg.tile %0 tile_sizes[16]
+// Expected: Compile error or runtime failure
+```
+**Discovery:** Not all operations support tile, has clear limitation conditions
+
+### Understanding Comparison Before vs After Tests
+
+| Question | Documentation Only | After Tests |
+|----------|-------------------|-------------|
+| How to specify tile size? | ⚠️ Unclear | ✅ Direct parameter |
+| How are remainders handled? | ❓ Not mentioned | ✅ Auto boundary check |
+| Which operations supported? | ❓ Incomplete list | ✅ Tests cover all supported ops |
+| What's loop order? | ⚠️ Vague description | ✅ Visible in test IR |
+
+**Conclusion:** Test cases supplement about **50%** of implementation details!
+```
+
+#### 6.5.5 Language-Specific Test File Parsing Points
+
+**Key points for each language's tests:**
+
+```markdown
+## Language-Specific Test File Parsing Points
+
+### Python (pytest/unittest)
+- Look for `test_*.py` or `*_test.py`
+- Note `@pytest.mark.parametrize` parameterized tests
+- Focus on `pytest.raises` exception tests
+- Find fixtures (`conftest.py`) for test context
+
+### C++ (gtest/gtest)
+- Look for `*_test.cpp` or `test/*.cpp`
+- `TEST_F` indicates fixture test with preconditions
+- `EXPECT_*` vs `ASSERT_*`: Whether execution continues on failure
+- `TEST_P` indicates parameterized test
+
+### MLIR/LLVM
+- Test files typically `.mlir` or `.td`
+- `RUN:` command specifies how to execute test
+- `// EXPECTED:` marks expected output
+- `// ERROR:` marks expected compilation errors
+- FileCheck directives: `CHECK-`, `CHECK-NOT:`, `CHECK-DAG:`
+
+### JavaScript/TypeScript (Jest)
+- `*.test.ts`, `*.spec.ts`
+- `describe/it` nested structure
+- `expect(...).toThrow()` exception tests
+- `beforeEach/afterEach` hook functions
+
+### Go
+- Tests co-located with source: `*_test.go`
+- `TestXxx(t *testing.T)` basic tests
+- `TableDrivenTests` table-driven tests
+- `TestMain` test entry point
+
+### Rust
+- `*_test.rs` inline tests
+- `tests/` directory integration tests
+- `#[should_panic]` exception tests
+- `#[ignore]` skipped tests
+```
+
+#### 6.5.6 Test Quality Assessment
+
+**Assess whether tests are adequate:**
+
+```markdown
+## Test Quality Assessment
+
+### Covered Functionality Points
+- ✅ Normal flow
+- ✅ Boundary inputs
+- ✅ Exception inputs
+- ⚠️ Concurrent scenarios
+- ❌ Performance tests
+
+### MLIR-Specific Assessment
+- ✅ Positive tests (valid.mlir)
+- ✅ Negative tests (invalid.mlir)
+- ⚠️ Performance regression tests
+- ❌ Cross-dialect interaction tests
+
+### Test Coverage Warning
+> ⚠️ **Warning: Module has insufficient test coverage**
+> - Uncovered scenarios: [List specific items]
+> - Suggested additions: [Specific recommendations]
+```
+
+#### 6.5.7 Test Case Analysis Output Template
+
+```markdown
+## Test Case Analysis
+
+### Test File Structure
+[List test files/directories and their corresponding source modules]
+
+### Key Test Case Interpretations
+[Select 3-5 most valuable test cases]
+
+### Hidden Behaviors Discovered from Tests
+[List details easily missed when reading code only]
+
+### Test Coverage Assessment
+- Core functionality coverage: X%
+- Boundary condition coverage: [Adequate/Insufficient]
+
+### Test Quality Recommendations
+[If tests inadequate, provide improvement suggestions]
+```
+
+---
+
+### Step 9: Application Transfer Test (Verify True Understanding)
 
 **Goal:** Test if concepts can apply to different scenarios
 
@@ -847,7 +1282,7 @@ def quicksort_logs(log_file, output_file, memory_limit):
 
 ---
 
-### Step 8: Dependencies & Usage Examples
+### Step 10: Dependencies & Usage Examples
 
 (Similar to original but with WHY explanations)
 
@@ -951,7 +1386,7 @@ Time: ~100ms (similar to success, prevent timing attack)
 
 ---
 
-### Step 9: Self-Assessment Checklist
+### Step 11: Self-Assessment Checklist
 
 **After analysis completion, mandatory verification of following items:**
 
@@ -1062,14 +1497,17 @@ If any answer is "no," the analysis is insufficient and needs supplementation.
 ## 6. Key Code Deep Analysis
 - Each segment: Line-by-line analysis (what + WHY) + Execution examples + Key takeaways
 
-## 7. Application Transfer Scenarios (at least 2)
+## 7. Test Case Analysis (if tests available)
+- Test file structure + Key test interpretations + Hidden behaviors discovered
+
+## 8. Application Transfer Scenarios (at least 2)
 - Each scenario: Unchanged principles + Parts needing modification + WHY transfer this way
 
-## 8. Dependencies & Usage Examples
+## 9. Dependencies & Usage Examples
 - Each dependency: WHY chosen + WHY not others
 - Examples contain detailed WHY comments
 
-## 9. Quality Verification Checklist
+## 10. Quality Verification Checklist
 [Check all verification items]
 ```
 
@@ -1148,6 +1586,16 @@ Before starting analysis, confirm:
 
 **After analysis completion, you MUST generate a standalone Markdown document!**
 
+### Three Mode Document Generation Strategies
+
+| Mode | Generation Method | File Count | Typical Use Case |
+|------|------------------|------------|------------------|
+| **Quick** | Single Write | 1 | Quick code review |
+| **Standard** | Single Write | 1 | Learning to understand code |
+| **Deep** | Auto-select strategy based on scale | 1-2 | Interview prep, complete mastery |
+| → Code ≤ 2000 lines | Progressive Write | 1-2 | Medium-small code |
+| → Code > 2000 lines | Multi-agent parallel + aggregate | Multiple chapters → 1 final doc | Large projects, complex codebases |
+
 ### ⚡ Token-Saving Strategies
 
 **Core Principle: Avoid duplicate output, write directly to file**
@@ -1208,11 +1656,41 @@ Before starting analysis, confirm:
       - List all file paths
    ```
 
-   **Method 3: Progressive generation (Deep Mode only)**
+   **Method 3: Deep Mode (auto-select based on code scale)**
    ```
-   For: Complex code with analysis expected over 5000 words
+   Deep Mode will auto-select optimal generation strategy:
 
-   See "Deep Mode Output Structure - Progressive Generation Flow" section above for details
+   【Strategy A: Progressive Generation】When code ≤ 2000 lines
+   - First generate framework document (TOC + summary)
+   - Fill sections incrementally, update file with each Write call
+   - See "Deep Mode Output Structure - Strategy A" section above
+
+   【Strategy B: Parallel Processing】When code > 2000 lines
+   Flow:
+   1. Master agent generates framework and task assignments
+   2. Use Task tool to create multiple parallel sub-agents
+   3. Each sub-agent focuses on one chapter, generates independent file
+   4. Master agent aggregates all chapters, generates final document
+
+   File structure:
+   work/
+   ├── 00-framework.json       # Framework generated by master agent
+   ├── tasks/                  # Sub-task description directory
+   │   ├── background-task.md
+   │   ├── concepts-task.md
+   │   └── ...
+   ├── chapters/               # Chapters generated by sub-agents
+   │   ├── background-chapter.md
+   │   ├── concepts-chapter.md
+   │   └── ...
+   └── [project-name]-complete-mastery-analysis.md  # Final aggregated document
+
+   Example Task call:
+   Task(
+     description: "Analyze Background & Motivation chapter",
+     prompt: "You are a background & motivation analysis expert. Please deeply analyze the following code's background and motivation...[specific instructions]",
+     subagent_type: "general-purpose"
+   )
    ```
 
 3. **Conversation Output Format (Brief)**
@@ -1249,14 +1727,99 @@ Before starting analysis, confirm:
 
 ### Large Project Chunking Guide
 
-| Project Scale | Generation Strategy | File Structure |
-|--------------|---------------------|----------------|
-| < 500 lines | Single document | `[name]-analysis.md` |
-| 500-2000 lines | Single document (may be long) | `[name]-analysis.md` |
-| 2000-10000 lines | By module | `[project]-overview.md` + `[module]-analysis.md` (3-5 files) |
-| > 10000 lines | Layered + by module | `[project]-architecture.md` + `[project]-overview.md` + `[module]-analysis.md` (multiple) |
+| Project Scale | Recommended Mode | Generation Strategy | File Structure |
+|--------------|-----------------|---------------------|----------------|
+| < 500 lines | Quick/Standard | Single document | `[name]-analysis.md` |
+| 500-2000 lines | Standard | Single document (may be long) | `[name]-analysis.md` |
+| 2000-10000 lines | Deep (auto parallel) | Parallel chapters | Multiple temp chapters → 1 final doc |
+| > 10000 lines | Deep (auto parallel) | Layered parallel | Module-level parallel + chapter-level parallel |
 
 **Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
+
+---
+
+### 🚀 Deep Mode Auto Implementation Guide (Specific Instructions for Claude)
+
+Deep Mode will auto-select optimal strategy. When parallel processing is needed:
+
+#### Step 1: Identify if parallel processing is needed
+```
+Auto-trigger conditions (any match):
+- Code files > 10
+- Total code lines > 2000
+- User explicitly says "large project", "complete project", "project analysis"
+- User uses depth triggers like "thoroughly", "completely master", "in-depth research" with large code scale
+```
+
+#### Step 2: Select processing strategy
+```
+if code_lines <= 2000:
+    Use Strategy A: Progressive Generation (sequential processing)
+else:
+    Use Strategy B: Parallel Processing (detailed below)
+```
+
+#### Step 3: Parallel processing preparation (Strategy B)
+```bash
+# Create working directory
+mkdir -p code-analysis/{tasks,chapters}
+
+# Generate framework file
+cat > code-analysis/00-framework.json << 'EOF'
+{
+  "project_name": "[Project Name]",
+  "language": "[Language]",
+  "total_lines": [Line Count],
+  "core_concepts": [Concept List],
+  "chapters": [
+    "Background & Motivation", "Core Concepts", "Algorithm & Theory",
+    "Design Patterns", "Code Analysis", "Test Case Analysis",
+    "Application Transfer", "Dependencies", "Quality Verification"
+  ]
+}
+EOF
+```
+
+#### Step 4: Create parallel sub-agents
+```
+For each chapter, use Task tool to create independent sub-agent:
+
+Task(
+  description: "Deep analyze [Chapter Name] chapter",
+  prompt: """
+  You are a [Chapter Name] analysis expert.
+
+  ## Context
+  - Project: {project_name}
+  - Language: {language}
+  - Core concepts: {core_concepts}
+
+  ## Task
+  Deeply analyze the [Chapter Name] part of the code, generate detailed chapter content (at least {min_words} words).
+
+  ## Requirements
+  - Use Scenario/Step + WHY style comments
+  - Answer 3 WHYs for each key point
+  - Provide concrete execution examples
+  - Cite authoritative sources
+
+  ## Output
+  Write complete chapter content to file:
+  code-analysis/chapters/{chapter_name}.md
+  """,
+  subagent_type: "general-purpose"
+)
+```
+
+#### Step 5: Aggregate results
+```
+After all sub-agents complete, use Read tool to read all chapter files, merge in order:
+
+1. Read code-analysis/00-framework.json
+2. Read code-analysis/chapters/*.md (in order)
+3. Merge into final document
+4. Write to {project_name}-complete-mastery-analysis.md
+```
 
 ---
 
@@ -1335,8 +1898,9 @@ Before starting analysis, confirm:
 | 4. Algorithm & Theory | 500 | Complexity, WHY, references |
 | 5. Design Patterns | 400 | Pattern name, WHY, standard reference |
 | 6. Key Code Analysis | 800 | Line-by-line, execution examples, scenarios |
-| 7. Application Transfer | 500 | ≥ 2 scenarios, constant principles, modifications |
-| 8. Dependencies | 300 | WHY per dependency, usage examples |
-| 9. Quality Verification | 200 | Checklist, four abilities test |
+| 7. Test Case Analysis | 400 | Test structure, key tests, hidden behaviors (if tests available) |
+| 8. Application Transfer | 500 | ≥ 2 scenarios, constant principles, modifications |
+| 9. Dependencies | 300 | WHY per dependency, usage examples |
+| 10. Quality Verification | 200 | Checklist, four abilities test |
 
 **Total: Deep Mode document should be ≥ 4000 words**
