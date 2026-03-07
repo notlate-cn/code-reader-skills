@@ -20,6 +20,7 @@ Professional code analysis tool based on cognitive science research, supporting 
 **🚀 Deep Mode internal smart strategy:**
 - Code ≤ 2000 lines: Progressive generation (sequential chapter filling)
 - Code > 2000 lines: Auto-enable parallel processing (sub-agents analyze chapters in parallel)
+- Code > 10000 lines / files > 20: Layered parallel (module-level scan first, then chapter-level parallel)
 
 ---
 
@@ -36,6 +37,7 @@ Professional code analysis tool based on cognitive science research, supporting 
 - Force self-explanation to verify true understanding
 - Build concept connections, not isolated memories
 - Test transfer ability through application variants
+- **Write like a friend explaining, not a textbook stacking jargon**
 
 **Research Foundation:**
 - [Dunlosky et al.](https://www.aft.org/ae/fall2013/dunlosky) - Elaborative interrogation significantly outperforms passive reading
@@ -225,11 +227,13 @@ Professional code analysis tool based on cognitive science research, supporting 
 
 | Phase | Executor | Operation | Output |
 |-------|----------|-----------|--------|
-| **1. Framework Prep** | Master Agent | Quick code overview, generate outline and core concepts | `framework.md` |
-| **2. Task Dispatch** | Master Agent | Create independent task descriptions for each chapter | Task list |
-| **3. Parallel Processing** | Sub-Agents | Each sub-agent focuses on one chapter, generates with depth | `chapter-N.md` |
-| **4. Result Aggregation** | Master Agent | Merge all chapters, unify format | `complete-analysis.md` |
-| **5. Quality Verification** | Master Agent | Check depth standards, supplement weak sections | Final document |
+| **1. Project Map** | Master Agent | **Enumerate all files**, build complete directory tree and module inventory | `project-map.md` |
+| **2. Framework Prep** | Master Agent | Based on project map, generate outline and core concepts | `framework.json` |
+| **3. Task Dispatch** | Master Agent | Create independent task descriptions for each chapter, **with explicit file path lists** | Task list |
+| **4. Parallel Processing** | Sub-Agents | Each sub-agent reads assigned files, generates depth analysis | `chapter-N.md` |
+| **5. Coverage Check** | Master Agent | **Compare against project map, identify uncovered files/modules** | Coverage report |
+| **6. Result Aggregation** | Master Agent | Merge all chapters, unify format | `complete-analysis.md` |
+| **7. Quality Verification** | Master Agent | Check depth standards, supplement weak sections | Final document |
 
 #### Chapter Task Definition (Template for Sub-Agents)
 
@@ -239,11 +243,18 @@ Professional code analysis tool based on cognitive science research, supporting 
 ## Context Information
 - **Code Name:** [Project/Code Name]
 - **Programming Language:** [Language]
-- **Code Scale:** [Line Count]
+- **Code Scale:** [Total Lines] / [File Count]
 - **Core Concepts:** [Concept list passed from master agent]
+- **Your Assigned Files:** [Explicit list of file paths, e.g.: src/auth.py, src/utils/crypto.py]
+- **Other Module Summary:** [Brief description of other modules' responsibilities, to avoid duplication]
 
 ## Your Task
-You are the analysis expert specializing in "**[Chapter Name]**". Please deeply analyze this chapter and generate detailed content.
+You are the analysis expert specializing in "**[Chapter Name]**". **You MUST use the Read tool to read each assigned file above** before analyzing — base all content on actual code, not memory or assumptions.
+
+## Mandatory Read Steps
+1. Use Read tool to read every file listed in "Your Assigned Files"
+2. Only begin analysis after confirming file contents
+3. If a file doesn't exist, explain why and analyze the nearest alternative
 
 ## Output Requirements
 1. **Content Depth:** This chapter must be at least [X] words
@@ -251,11 +262,13 @@ You are the analysis expert specializing in "**[Chapter Name]**". Please deeply 
 3. **Code Comments:** Use Scenario/Step + WHY style
 4. **Source References:** Provide authoritative reference links
 5. **Independence:** Generate complete independent chapter content, no need to reference other chapters
+6. **Coverage Completeness:** Every public function/class in your assigned files must be mentioned
 
 ## Output Format
 Output Markdown format chapter content directly, starting with `## [Chapter Name]`.
 
 ## Depth Standards
+- [ ] All assigned files have been read (no files skipped)
 - [ ] All subsections covered (no "skipped" or "same as above")
 - [ ] Each WHY has at least 2-3 sentences of explanation
 - [ ] Code examples have complete comments
@@ -284,17 +297,49 @@ Begin analysis:
    chapter_9_verification.md
    ```
 
-2. **Merge Order**
+2. **Coverage Check (Critical step to prevent information loss)**
+
+   Compare the complete file list in `project-map.md` against what was analyzed:
+
+   ```markdown
+   ## Coverage Check Report
+
+   ### File Coverage
+   | File Path | Analyzed | Chapter | Notes |
+   |-----------|----------|---------|-------|
+   | src/auth.py | ✅ | chapter_5 | Core auth logic |
+   | src/utils/crypto.py | ✅ | chapter_5 | Crypto utilities |
+   | src/models/user.py | ❌ | - | Not covered, needs supplement |
+   | tests/test_auth.py | ✅ | chapter_6 | Test analysis |
+
+   ### Module Coverage Rate
+   - Core modules: X/Y covered
+   - Utility modules: X/Y covered
+   - Test files: X/Y covered
+
+   ### Uncovered Content Handling
+   [List all uncovered files, supplement brief analysis or explain why skipped]
+   ```
+
+   **Handling uncovered content:**
+   - Important files (core business logic): Supplement analysis immediately
+   - Secondary files (config, utils): Briefly mention in dependencies chapter
+   - Test files: Confirm already covered in test case analysis chapter
+
+3. **Merge Order**
    ```markdown
    # [Code Name] Complete Mastery Analysis (Parallel Deep Edition)
 
    ## Understanding Verification Status
    [Generated from master agent's preliminary analysis]
 
+   ## Coverage Summary
+   [Total project files, analyzed file count, coverage percentage]
+
    [Insert each chapter content in order]
    ```
 
-3. **Cross-Check**
+4. **Cross-Check**
    - Core concepts have consistent definitions across chapters
    - WHY explanations have no contradictions
    - Referenced code examples are consistent
@@ -308,61 +353,93 @@ Begin analysis:
 #### Implementation Pseudocode
 
 ```
-Function: ParallelDeepMode(code, workDirectory):
+Function: ParallelDeepMode(projectPath, workDirectory):
+
+  // ========== Phase 0: Build Complete Project Map (Key step to prevent info loss) ==========
+  projectMap = {
+    "all_files": RecursiveEnumerate(projectPath),   // Absolute path list of ALL source files
+    "directory_tree": GenerateTree(projectPath),
+    "file_stats": {
+      "total_files": len(all_files),
+      "total_lines": CountAllLines(all_files),
+      "by_language": ClassifyByLanguage(all_files),
+      "by_directory": ClassifyByDirectory(all_files)
+    },
+    "entry_files": IdentifyEntryFiles(all_files),   // main, index, __init__, etc.
+    "core_modules": IdentifyCoreModules(all_files),
+    "test_files": FilterTestFiles(all_files),
+    "config_files": FilterConfigFiles(all_files)
+  }
+
+  WriteFile(f"{workDirectory}/project-map.md", FormatProjectMap(projectMap))
 
   // ========== Phase 1: Framework Preparation ==========
+  // Note: Based on complete project map — never analyze just partial files
   framework = {
-    "code_name": ExtractName(code),
-    "language": IdentifyLanguage(code),
-    "code_scale": CountLines(code),
-    "core_concepts": ExtractCoreConcepts(code),  // Shared with all sub-agents
-    "chapter_list": [
-      "Background & Motivation",
-      "Core Concepts",
-      "Algorithm & Theory",
-      "Design Patterns",
-      "Key Code Analysis",
-      "Test Case Analysis",
-      "Application Transfer Scenarios",
-      "Dependencies",
-      "Quality Verification"
-    ]
+    "code_name": ExtractName(projectPath),
+    "language": IdentifyLanguage(projectMap),
+    "code_scale": projectMap["file_stats"]["total_lines"],
+    "core_concepts": ExtractCoreConcepts(projectMap["core_modules"]),
+    "module_responsibilities": GenerateOneLineSummaryForEachModule(),  // Shared with sub-agents
+    "chapter_file_mapping": {  // Explicitly assign files to each chapter
+      "Background & Motivation": [entry_files, README, main_config],
+      "Core Concepts": [core_module_list],
+      "Algorithm & Theory": [files_containing_algorithms],
+      "Design Patterns": [core_module_list],
+      "Key Code Analysis": [top_5_to_10_most_important_files],
+      "Test Case Analysis": [test_file_list],
+      "Application Transfer": [core_module_list],
+      "Dependencies": [dependency_config_files + all_files_list],
+      "Quality Verification": []  // Handled by master agent
+    }
   }
 
   WriteFile(f"{workDirectory}/00-framework.json", framework)
 
-  // ========== Phase 2: Create Sub-Tasks ==========
+  // ========== Phase 2: Create Sub-Tasks (with explicit file paths) ==========
   subTaskList = []
 
-  for each chapter in framework["chapter_list"]:
-    taskDescription = GenerateTaskTemplate(chapter, framework)
+  for each chapter in framework["chapter_file_mapping"]:
+    assignedFiles = framework["chapter_file_mapping"][chapter]
+    taskDescription = GenerateTaskTemplate(
+      chapter, framework,
+      assignedFiles=assignedFiles,                    // Tell sub-agent which files to read
+      moduleResponsibilities=framework["module_responsibilities"]  // Avoid duplication
+    )
     taskFile = f"{workDirectory}/tasks/{chapter}-task.md"
     WriteFile(taskFile, taskDescription)
     subTaskList.append(taskFile)
 
   // ========== Phase 3: Execute Sub-Agents in Parallel ==========
-  // Note: Actual execution via Task tool creating parallel sub-agents
-
   chapterFileList = []
 
   for each taskFile in subTaskList:
-    // Create sub-agent (parallel execution)
     subAgent = CreateAgent(
       name: f"Analyze-{chapter}",
       task: ReadFile(taskFile),
-      code: code,
       outputFile: f"{workDirectory}/chapters/{chapter}.md"
     )
-
-    // Start parallel execution
     subAgent.start(parallel=True)
     chapterFileList.append(subAgent.outputFile)
 
-  // Wait for all sub-agents to complete
   WaitAll(chapterFileList)
 
-  // ========== Phase 4: Result Aggregation ==========
+  // ========== Phase 4: Coverage Check ==========
+  analyzedFiles = ExtractReferencedFilePaths(chapterFileList)
+  uncoveredFiles = projectMap["core_modules"] - analyzedFiles
+
+  if len(uncoveredFiles) > 0:
+    // Supplement analysis for important uncovered files
+    for each file in uncoveredFiles:
+      if file.IsCoreModule():
+        supplement = CreateAgent(task=f"Analyze {file}, write to coverage supplement chapter")
+        chapterFileList.append(supplement.outputFile)
+
+  // ========== Phase 5: Result Aggregation ==========
   completeDoc = "# {framework['code_name']} Complete Mastery Analysis\n\n"
+  completeDoc += "## Coverage Summary\n"
+  completeDoc += f"- Total files: {projectMap['file_stats']['total_files']}\n"
+  completeDoc += f"- Core modules covered: {len(analyzedFiles)}/{len(projectMap['core_modules'])}\n"
   completeDoc += "## Understanding Verification Status\n\n"
   completeDoc += GenerateVerificationTable(framework) + "\n\n"
 
@@ -370,11 +447,10 @@ Function: ParallelDeepMode(code, workDirectory):
     chapterContent = ReadFile(chapterFile)
     completeDoc += chapterContent + "\n\n"
 
-  // ========== Phase 5: Quality Verification ==========
+  // ========== Phase 6: Quality Verification ==========
   if not PassDepthCheck(completeDoc):
     weakChapters = IdentifyWeakParts(completeDoc)
     for each chapter in weakChapters:
-      // Re-execute that chapter's sub-agent, requiring deeper content
       ReExecute(chapter)
       completeDoc = UpdateChapter(completeDoc, chapter)
 
@@ -398,6 +474,32 @@ Function: ParallelDeepMode(code, workDirectory):
 - File/project scale
 - Core dependencies
 - Code type (algorithm, business logic, framework code, etc.)
+
+**For projects with more than 5 files, additionally required:**
+
+```markdown
+## Project Complete Map (Prevent Information Loss)
+
+### Full Directory Tree
+[Use tools to enumerate all files, generate tree structure]
+
+### File Inventory (Categorized)
+| Category | File Path | Lines | Responsibility |
+|----------|-----------|-------|---------------|
+| Core Logic | src/auth.py | 350 | User authentication & authorization |
+| Core Logic | src/db.py | 180 | Database operations wrapper |
+| Utilities | src/utils/crypto.py | 90 | Encryption/hashing tools |
+| Tests | tests/test_auth.py | 210 | Auth functional tests |
+| Config | config/settings.py | 60 | Application configuration |
+
+### Entry Point
+- Main entry: [file path] - WHY start here
+
+### Core Call Chain
+[Entry → Module A → Module B → ...]
+```
+
+**Note: This step must be completed before analyzing any specific code. It is the foundation for preventing information loss.**
 
 ---
 
@@ -1582,6 +1684,78 @@ Before starting analysis, confirm:
 
 ---
 
+## ✍️ Human-Friendly Writing Standards
+
+**The analysis document should read like an experienced engineer explaining things to you, not a textbook mechanically reciting definitions.**
+
+### Core Requirements
+
+**1. Open with a conversational lead-in, not a bare definition**
+
+❌ Stiff:
+> The `authenticate_user` function is responsible for executing the user identity verification process, accepting username and password parameters...
+
+✅ Natural:
+> Think of this function as the bouncer at the door. Every time a user tries to log in, they have to go through it. The logic is simple: first check if the user exists, then verify the password — only then do they get in.
+
+**2. When explaining WHY, lead with the conclusion, then expand**
+
+❌ Stiff:
+> Due to bcrypt's adaptive hashing function characteristics, its computational cost can be dynamically adjusted via the cost factor parameter, hence its selection.
+
+✅ Natural:
+> The reason to use bcrypt instead of MD5 comes down to speed — MD5 is too fast. A regular computer can compute billions of MD5 hashes per second, making brute force trivial. bcrypt is deliberately slow, and you can tune just how slow it is as hardware improves.
+
+**3. Analogies are your friend**
+
+- Locks → "A read-write lock is like a library reading room: many people can read at once, but when someone needs to write, everyone else has to wait"
+- Caching → "A cache is like keeping frequently used things on your desk instead of fetching from the warehouse every time"
+- Recursion → "Like looking up a word in a dictionary, only to find you need to look up another word in its definition"
+
+**4. Code comments should speak plain language**
+
+❌ Stiff comment:
+```python
+# Execute password hash verification operation
+if verify_password(password, user.password_hash):
+```
+
+✅ Natural comment:
+```python
+# Check the password: re-hash what the user typed and see if it matches what's stored
+# (We can't compare plain text because the database never stored it in plain text)
+if verify_password(password, user.password_hash):
+```
+
+**5. For complex concepts, explain in layers**
+
+First give the intuition in one sentence, then add technical detail:
+> JWT is essentially a "stamped pass." When you log in successfully, the server hands you a pass. On every subsequent request you bring it along, the server checks that the stamp is genuine, and if so, lets you through. Technically it's three Base64-encoded segments joined by dots: header, payload, and signature.
+
+**6. Flag "this is where people get tripped up"**
+
+Don't just describe the happy path — call out common mistakes:
+> ⚠️ **Common misconception:** Many people assume JWT is encrypted. It's not — it's only signed. Anyone can Base64-decode the payload and read it. Never put passwords, credit card numbers, or other sensitive data inside.
+
+### Writing Patterns to Avoid
+
+| Pattern | Why it's a problem |
+|---------|-------------------|
+| Wall of jargon with no explanation | Reader can't see how the terms relate |
+| "This function implements X functionality" | States the obvious — reader already knows that |
+| Every paragraph opens with the same sentence structure | Feels machine-generated, causes fatigue |
+| WHY explanation in a single sentence | Doesn't actually answer why |
+| Copy-pasting official documentation wording | The docs already exist; parroting adds no value |
+
+### Self-Check Questions
+
+After writing, ask yourself:
+- Could a junior engineer just starting out follow this?
+- Did I explain *why*, or only *what*?
+- Does the reader get an "aha, now I get it!" moment anywhere?
+
+---
+
 ## 📤 Output Requirements (Token-Optimized)
 
 **After analysis completion, you MUST generate a standalone Markdown document!**
@@ -1727,12 +1901,12 @@ Before starting analysis, confirm:
 
 ### Large Project Chunking Guide
 
-| Project Scale | Recommended Mode | Generation Strategy | File Structure |
-|--------------|-----------------|---------------------|----------------|
-| < 500 lines | Quick/Standard | Single document | `[name]-analysis.md` |
-| 500-2000 lines | Standard | Single document (may be long) | `[name]-analysis.md` |
-| 2000-10000 lines | Deep (auto parallel) | Parallel chapters | Multiple temp chapters → 1 final doc |
-| > 10000 lines | Deep (auto parallel) | Layered parallel | Module-level parallel + chapter-level parallel |
+| Project Scale | Recommended Mode | Generation Strategy | File Structure | Info Loss Prevention |
+|--------------|-----------------|---------------------|----------------|---------------------|
+| < 500 lines | Quick/Standard | Single document | `[name]-analysis.md` | Not needed |
+| 500-2000 lines | Standard | Single document (may be long) | `[name]-analysis.md` | Build file inventory |
+| 2000-10000 lines / files ≤ 20 | Deep (Strategy B) | Project map + parallel chapters | project-map.md + chapters → 1 final doc | Project map + coverage check |
+| > 10000 lines / files > 20 | Deep (Strategy C) | Layered parallel | Module summaries + chapters → 1 final doc | Module scan + chapter coverage check |
 
 **Important: Don't output complete analysis in conversation - write directly to file, only output summary!**
 
@@ -1755,32 +1929,59 @@ Auto-trigger conditions (any match):
 ```
 if code_lines <= 2000:
     Use Strategy A: Progressive Generation (sequential processing)
+elif code_lines <= 10000 and file_count <= 20:
+    Use Strategy B: Parallel Processing (chapter-level parallel)
 else:
-    Use Strategy B: Parallel Processing (detailed below)
+    Use Strategy C: Layered Parallel (module-level + chapter-level)
 ```
 
-#### Step 3: Parallel processing preparation (Strategy B)
+#### Step 3: Parallel processing preparation (Strategy B/C)
 ```bash
+# Step 1: Enumerate ALL project files (critical for preventing info loss)
+# Use tools to list all source files and generate complete inventory
+
 # Create working directory
 mkdir -p code-analysis/{tasks,chapters}
 
-# Generate framework file
+# Generate project map (must include all file paths)
+cat > code-analysis/project-map.md << 'EOF'
+# Project File Map
+
+## Complete File Inventory
+| File Path | Category | Lines | Responsibility |
+|-----------|----------|-------|---------------|
+| [List every file here] | | | |
+
+## Core Module List
+[List core business logic files]
+
+## Test File List
+[List all test files]
+EOF
+
+# Generate framework file (with chapter-to-file mapping)
 cat > code-analysis/00-framework.json << 'EOF'
 {
   "project_name": "[Project Name]",
   "language": "[Language]",
+  "total_files": [File Count],
   "total_lines": [Line Count],
   "core_concepts": [Concept List],
-  "chapters": [
-    "Background & Motivation", "Core Concepts", "Algorithm & Theory",
-    "Design Patterns", "Code Analysis", "Test Case Analysis",
-    "Application Transfer", "Dependencies", "Quality Verification"
-  ]
+  "chapter_file_mapping": {
+    "Background & Motivation": ["path/to/main.py", "README.md"],
+    "Core Concepts": ["path/to/core1.py", "path/to/core2.py"],
+    "Algorithm & Theory": ["path/to/algo.py"],
+    "Design Patterns": ["path/to/core1.py", "path/to/core2.py"],
+    "Key Code Analysis": ["path/to/most_important.py", "..."],
+    "Test Case Analysis": ["tests/test_a.py", "tests/test_b.py"],
+    "Application Transfer": ["path/to/core1.py"],
+    "Dependencies": ["requirements.txt", "...all files list"]
+  }
 }
 EOF
 ```
 
-#### Step 4: Create parallel sub-agents
+#### Step 4: Create parallel sub-agents (with explicit file paths)
 ```
 For each chapter, use Task tool to create independent sub-agent:
 
@@ -1793,6 +1994,15 @@ Task(
   - Project: {project_name}
   - Language: {language}
   - Core concepts: {core_concepts}
+  - Module responsibilities: {module_responsibilities}  # To avoid duplication
+
+  ## Files You Must Read (in priority order)
+  {chapter_file_list}  # From chapter_file_mapping for this chapter
+
+  ## Mandatory Steps
+  1. Use Read tool to read each file listed above
+  2. Only begin analysis after reading all assigned files
+  3. Analysis must reference actual code lines, not memory
 
   ## Task
   Deeply analyze the [Chapter Name] part of the code, generate detailed chapter content (at least {min_words} words).
@@ -1802,6 +2012,7 @@ Task(
   - Answer 3 WHYs for each key point
   - Provide concrete execution examples
   - Cite authoritative sources
+  - Every public function/class in assigned files must be mentioned
 
   ## Output
   Write complete chapter content to file:
@@ -1811,14 +2022,19 @@ Task(
 )
 ```
 
-#### Step 5: Aggregate results
+#### Step 5: Coverage check and aggregate results
 ```
-After all sub-agents complete, use Read tool to read all chapter files, merge in order:
+After all sub-agents complete:
 
-1. Read code-analysis/00-framework.json
-2. Read code-analysis/chapters/*.md (in order)
-3. Merge into final document
-4. Write to {project_name}-complete-mastery-analysis.md
+1. Read code-analysis/project-map.md for the complete file list
+2. Scan code-analysis/chapters/*.md, extract all referenced file paths
+3. Generate coverage report:
+   - Core module coverage target: 100%
+   - Overall coverage target: ≥ 80%
+4. For uncovered core modules, create supplemental analysis tasks
+6. Read code-analysis/chapters/*.md (in order)
+7. Merge into final document with coverage summary header
+8. Write to {project_name}-complete-mastery-analysis.md
 ```
 
 ---
