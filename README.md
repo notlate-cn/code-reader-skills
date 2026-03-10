@@ -5,7 +5,7 @@
 **基于认知科学的源代码深度理解工具 | Cognitive Science-Based Code Analysis Tool**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.3.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
+[![Version](https://img.shields.io/badge/version-2.4.0-green.svg)](https://github.com/notlate-cn/code-reader-skills/releases)
 [![Claude Skills](https://img.shields.io/badge/Claude-Skills-orange.svg)](https://claude.ai)
 [![Language](https://img.shields.io/badge/language-中文%20%7C%20English-red.svg)](#)
 
@@ -159,14 +159,15 @@ message = client.messages.create(
 4. 📌 核心概念说明
 5. 📐 算法与理论
 6. 🏗️ 设计模式
-7. 💻 关键代码深度解析（场景化注释）
+7. 💻 关键代码深度解析（6A 核心片段识别 + 6B 六节深度解读）
 8. 📦 依赖与使用示例
 
 #### Deep Mode（完全掌握）🚀
 [包含 Standard Mode 所有内容，加上]
 - 🔗 概念网络图
-- 📊 完整执行示例（多场景追踪）
-- 🧪 **测试用例分析**（如有测试，通过测试反向理解代码）
+- 🔍 **核心片段识别**（6A）：从大型代码中筛选 3-7 个最值得深读的片段
+- 💻 **六节深度解读**（6B）：每片段按「整体作用 → 核心逻辑 → 逐行解析 → 设计点 → 三组示例 → 改进建议」解读
+- 🧪 **测试用例分析**（如有测试，选 3-5 个典型用例说明代码功能）
 - 🚀 应用迁移场景（至少 2 个）
 - ✅ 质量验证清单
 - 🤖 **智能策略选择**：代码 ≤ 2000 行使用渐进式生成，代码 > 2000 行自动启用并行处理
@@ -254,6 +255,17 @@ def authenticate_user(username, password):
 </details>
 
 ### 📝 更新日志
+
+#### v2.4.0 (2026-03-10)
+
+**新增功能：**
+- 🔍 **核心片段识别（6A）**：大型项目先按优先级筛选 3-7 个最值得深读的片段，避免"全部浅析"
+- 💻 **六节深度解读模板（6B）**：每个核心片段按「整体作用 / 核心逻辑 / 逐行解析 / 设计点 / 三组对比示例 / 改进建议」结构化解读
+- 🤖 **子 Agent 两阶段指令**：关键代码解析子 Agent 强制执行片段识别 → 深度解读工作流
+
+**重构：**
+- 📦 SKILL.md 从 2371 行精简至 688 行（精简 71%），删除冗余示例和重复结构，保留全部执行逻辑
+- 🌐 中英文版同步更新，结构完全一致
 
 #### v2.3.0 (2026-02-07)
 
@@ -465,14 +477,15 @@ You: /code-reader-v2-en Thoroughly analyze this large project
 4. Core Concepts
 5. Algorithm & Theory
 6. Design Patterns
-7. Key Code Deep Analysis (Scenario-based comments)
+7. Key Code Deep Analysis (6A snippet identification + 6B six-section deep-dive)
 8. Dependencies & Usage Examples
 
 #### Deep Mode 🚀
 [All Standard Mode content, plus]
 - Concept Network Diagram
-- Complete Execution Examples (Multi-scenario tracking)
-- **Test Case Analysis** (if tests exist, reverse-understand code through tests)
+- **Core Snippet Identification (6A)**: Select 3-7 most important snippets from large codebases
+- **Six-Section Deep-Dive (6B)**: Each snippet analyzed as: Purpose → Logic → Line-by-line → Design points → 3 examples → Improvements
+- **Test Case Analysis** (if tests exist, select 3-5 typical test cases to illustrate functionality)
 - Application Transfer Scenarios (at least 2)
 - Quality Verification Checklist
 - **Smart Strategy Selection**: Code ≤ 2000 lines uses progressive, code > 2000 lines auto-enables parallel processing
@@ -526,6 +539,17 @@ Contributions are welcome! Here's how to participate:
 </details>
 
 ### 📝 Changelog
+
+#### v2.4.0 (2026-03-10)
+
+**New Features:**
+- 🔍 **Core Snippet Identification (6A)**: For large projects, prioritize and select 3-7 most important snippets before deep analysis
+- 💻 **Six-Section Deep-Dive Template (6B)**: Each snippet analyzed with: Purpose / Logic / Line-by-line / Design points / 3 comparison examples / Improvements
+- 🤖 **Two-phase sub-agent instruction**: Code analysis sub-agents enforce snippet identification → deep-dive workflow
+
+**Refactor:**
+- 📦 SKILL.md trimmed from 2371 to 688 lines (71% reduction), removing redundant examples and duplicate structures while preserving all execution logic
+- 🌐 Chinese and English versions synchronized with identical structure
 
 #### v2.3.0 (2026-02-07)
 
