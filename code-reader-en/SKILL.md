@@ -82,14 +82,41 @@ else:  # lines > 10000 or files > 20
 
 ### Deep Mode (30+ min)
 
-Additionally includes on top of Standard:
-- `## 3+. Concept Network Diagram`: Core concept inventory (3 WHYs each) + concept relationship matrix
-- `## 6+. Key Code Deep Analysis`: 6A core segment inventory + 6B 6-section analysis per segment
-- `## 8. Test Case Analysis` (if code includes tests)
-- `## 9. Application Transfer Scenarios` (at least 2)
-- `## 10. Dependencies & Usage Examples`
-- `## 11. Quality Verification Checklist`
-- `## Coverage Summary` (in parallel mode)
+**Complete chapter structure (strictly follow this numbering — do NOT introduce extra levels like Phase/Part/Section/Module):**
+
+```markdown
+# [Code Name] Deep Understanding Analysis
+
+## Understanding Verification Status
+## Project Complete Map (when file count > 5)
+## 1. Quick Overview
+## 2. Background & Motivation (3 WHYs)
+## 3. Core Concept Network (3 WHYs per concept + relationship matrix)
+## 4. Algorithms & Theory (complexity + WHY + references)
+## 5. Design Patterns (WHY used + what if not used)
+## 6. Key Code Deep Analysis
+### Core Segment Inventory (6A)
+### Segment #1: [Name]
+#### 1.1 Overall Purpose
+#### 1.2 Core Logic Analysis
+#### 1.3 Line-by-Line Explanation
+#### 1.4 Key Design Points
+#### 1.5 Complete Examples (three contrasting cases)
+#### 1.6 Usage Notes & Improvement Suggestions
+### Segment #2: [Name]
+[Same 6-section structure, section numbers match segment number]
+...
+## 7. Test Case Analysis (when test files detected)
+## 8. Application Transfer Scenarios (at least 2)
+## 9. Dependencies & Usage Examples
+## 10. Quality Verification Checklist
+## Coverage Summary (in parallel mode)
+```
+
+**⚠️ Key Rules:**
+- `## 6. Key Code Deep Analysis` is the ONLY core code chapter — all segments live under it
+- Segment titles use `### Segment #N: [Name]`, 6 sections use `#### N.1 ~ N.6`
+- Do NOT use `## Phase N`, `## Module N`, `## Stage N` or any custom chapter level that breaks numbering continuity
 
 ---
 
@@ -269,24 +296,30 @@ This step is the core of the entire analysis, divided into two phases.
 
 #### Phase 6B: Per-Segment Deep Analysis (6-Section Template)
 
+**⚠️ Hard requirements (enforced everywhere — main flow and subagents):**
+- No section may contain "omitted", "see above", "same as above", "details above"
+- N.3 MUST include actual code (≥30 lines of core logic) — description-only is not acceptable
+- Every WHY must be at least 2 sentences — single-sentence conclusions are forbidden
+- Each segment's 6 sections combined must total ≥1000 words
+
 **For each core segment, strictly output using the following 6-section structure:**
 
 ```markdown
-## Segment #N: [Segment Name]
+### Segment #N: [Segment Name]
 
 > 📍 **Location:** `file path:line range`
 > 🎯 **Priority:** ★★★
 > 💡 **Core in One Line:** [Summarize the essence of this code in one sentence]
 
-### N.1 Overall Purpose
+#### N.1 Overall Purpose (≥150 words)
 
 [3-5 sentences describing the core goal]
 
-**What problem does it solve?** What are the consequences without it?
+**What problem does it solve?** What are the consequences without it (at least 2 sentences)?
 **System layer position:** [Business logic / Scheduler / Compiler frontend / IR transformation / etc.]
 **Role and dependencies:** What does it depend on upstream? How is it used downstream?
 
-### N.2 Core Logic Analysis
+#### N.2 Core Logic Analysis (≥200 words)
 
 **Execution Flow:**
 ```
@@ -295,33 +328,33 @@ Input → [Step 1] → [Step 2] → ... → Output
               [Branch A / Branch B]
 ```
 
-**Key algorithm/data structure:** [Name] — Why chosen?
+**Key algorithm/data structure:** [Name] — Why chosen (at least 2 sentences explaining WHY)?
 
 **Core state variables:**
 | Variable | Initial Value | When it Changes | Final State |
 |----------|--------------|-----------------|-------------|
 | [var] | [init] | [timing] | [final] |
 
-**Multiple execution paths:**
-- **Path A (normal):** Trigger condition → Result
-- **Path B (exception/boundary):** Trigger condition → Result
+**Multiple execution paths (at least 2):**
+- **Path A (normal):** Trigger condition → Key state changes → Result
+- **Path B (exception/boundary):** Trigger condition → Key state changes → Result
 
-### N.3 Line-by-Line Code Analysis
+#### N.3 Line-by-Line Code Analysis (≥300 words, MUST include actual code)
 
 > **Running example input:** `[Specific value]`
 
 ```[language]
-[Original code with Scenario/Step comments + variable value tracking]
+[Paste real code — at least 30 lines of core logic]
 
 // Step 1: [Operation description]
 [code line]
-// WHY: [Reason]
+// WHY: [Reason — at least 2 sentences]
 // At this point: [variable] = [value]
 
 // Scenario 1: [Condition description]
 if [condition]:
     [code]
-    // WHY: [Reason]
+    // WHY: [Reason — at least 2 sentences]
 ```
 
 Comment style conventions:
@@ -329,18 +362,18 @@ Comment style conventions:
 - `# Step N: [description]` / `// Step N: [description]` — label sequential execution flow
 - `# At this point: [variable] = [value]` — track variable state
 
-### N.4 Key Design Points
+#### N.4 Key Design Points (≥200 words)
 
-| Design Dimension | Analysis |
+| Design Dimension | Analysis (each row ≥2 sentences) |
 |-----------------|---------|
-| **Implementation Choice** | Why this approach? What alternatives exist? |
-| **Performance Optimization** | Memory, computation, concurrency optimizations? |
+| **Implementation Choice** | Why this approach? What alternatives exist? Why not alternatives? |
+| **Performance Optimization** | Memory, computation, concurrency optimizations? Quantify if possible. |
 | **Compiler-Related** | IR transformations/Pass design/scheduling strategy? (write "N/A" if not applicable) |
 | **Safety & Robustness** | Boundary checks, error handling, exception paths? |
-| **Extensibility** | Where are the extension points? |
+| **Extensibility** | Where are the extension points? How to extend? |
 | **Potential Issues** | Known limitations, risks, or areas for improvement? |
 
-### N.5 Complete Examples (Three Contrasting Cases)
+#### N.5 Complete Examples (Three Contrasting Cases, ≥150 words)
 
 > Three examples use the same code logic with only input changes to form a contrast.
 
@@ -353,15 +386,14 @@ Comment style conventions:
 **Example 3 — Boundary or Exception Case**
 - **Input:** `[Extreme/null/invalid input]` → **Handling:** [Is there protection? Crash or graceful degradation?] → **Result and reason**
 
-### N.6 Usage Notes & Improvement Suggestions
+#### N.6 Usage Notes & Improvement Suggestions (≥100 words)
 
-**Things to note when using this segment:**
-1. [Note 1]
-2. [Note 2]
+**Things to note when using this segment (≥2 notes, each ≥2 sentences):**
+1. [Note 1 + what happens if ignored]
+2. [Note 2 + what happens if ignored]
 
-**Possible improvements:**
-- [Improvement direction 1: WHY is it better?]
-- [Improvement direction 2]
+**Possible improvements (≥1):**
+- [Improvement direction: specific description + WHY it's better (at least 2 sentences)]
 ```
 
 ---
@@ -624,13 +656,15 @@ Output Markdown format directly, starting with `## [Chapter Name]`.
 | 3. Core Concepts | 600 | 3 WHYs per concept, relationship matrix |
 | 4. Algorithm & Theory | 500 | Complexity, WHY, references |
 | 5. Design Patterns | 400 | Pattern name, WHY, standard references |
-| 6. Key Code Analysis | 800 | Segment inventory, 6-section analysis, example tracking |
+| 6. Key Code Analysis | ≥1000 words per segment (3 segments minimum = ≥3000 words) | Segment inventory, each segment 6 sections (real code ≥30 lines, three contrasting examples) |
 | 7. Test Case Analysis | 400 | Test coverage, boundary conditions, test discoveries |
 | 8. Application Transfer | 500 | ≥2 scenarios, constant principles, modified parts |
 | 9. Dependencies | 300 | WHY per dependency, usage examples |
 | 10. Quality Verification | 200 | Verification checklist, four abilities test |
 
-**Deep Mode document should be ≥ 4300 words**
+**Deep Mode document should be ≥ 8000 words (including code comments)**
+
+**⚠️ Critical reminder: Chapter numbering must be continuous — do NOT use Phase/Module/Stage etc. to break the numbered sequence**
 ```
 
 ---
