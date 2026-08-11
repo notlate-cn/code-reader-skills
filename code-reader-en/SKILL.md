@@ -1,6 +1,6 @@
 ---
 name: code-reader-v2-en
-description: Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick (quick overview), Standard (standard understanding), Deep (deep mastery, auto-parallel for large projects). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code.
+description: "Cognitive science-based source code deep understanding assistant (English improved version). Supports 3 analysis modes: Quick (quick overview), Standard (standard understanding), Deep (deep mastery, auto-parallel for large projects). Combines elaborative interrogation, self-explanation testing, and retrieval practice to help truly understand and master code."
 ---
 
 # Source Code Deep Understanding Analyzer v2.3 (English Version)
