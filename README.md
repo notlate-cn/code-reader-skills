@@ -256,6 +256,11 @@ def authenticate_user(username, password):
 
 ### 📝 更新日志
 
+#### v2.4.1 (2026-08-11)
+
+**修复：**
+- 🐛 修复英文版 `description` 中英文冒号导致 YAML frontmatter 解析失败的问题（加引号转义），`code-reader-en.skill` 同步更新
+
 #### v2.4.0 (2026-03-10)
 
 **新增功能：**
@@ -539,6 +544,11 @@ Contributions are welcome! Here's how to participate:
 </details>
 
 ### 📝 Changelog
+
+#### v2.4.1 (2026-08-11)
+
+**Fixes:**
+- 🐛 Fixed YAML frontmatter parse failure caused by unquoted colons in the English `description` (quoted for escaping); `code-reader-en.skill` updated accordingly
 
 #### v2.4.0 (2026-03-10)
 
